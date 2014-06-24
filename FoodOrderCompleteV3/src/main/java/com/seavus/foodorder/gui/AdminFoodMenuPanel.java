@@ -332,6 +332,10 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 			String restaurantName = (String) restaurantsCombo.getSelectedItem();
 			Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(restaurantName, "EN");
 			Food food = new Food(getName(),getType(), foodPrice, restaurant);
+			//food.setName("MK", mk_name);
+			//food.setName("EN", en_name);
+			//food.setType("EN", en_type);
+			//food.setType("MK", mk_type);
 			getFoodManager().addFood(food);
 			JOptionPane.showMessageDialog(contentPane,"Food successfuly created","INFO",JOptionPane.INFORMATION_MESSAGE);										
 			emptyFields();									

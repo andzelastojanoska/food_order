@@ -60,6 +60,21 @@ public class RestaurantManagerImpl implements RestaurantManager {
 		}
 
 	}
+	
+	@Override
+	public void updateRestaurant(String name, String phoneNumber, String language, String localisedName, Restaurant restaurant) {
+		
+		restaurant.setName(name);
+		restaurant.setPhoneNumber(phoneNumber);
+		restaurant.setName(language, localisedName);
+		try {
+			HibernateUtil.beginTransaction();
+			restaurantDAO.merge(restaurant);
+			HibernateUtil.commitTransaction();
+		} catch (HibernateException e) {
+			// handle exception
+		}
+	}
 
 	@Override
 	public void deleteRestaurant(Restaurant restaurant) {

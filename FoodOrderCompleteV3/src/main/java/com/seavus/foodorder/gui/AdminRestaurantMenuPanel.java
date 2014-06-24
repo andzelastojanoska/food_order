@@ -234,6 +234,8 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 	public void createRestaurantAction() {
 		if (checkIfFieldIsNotEmpty(name) && checkIfFieldIsNotEmpty(phone)) {
 			Restaurant restaurant = new Restaurant(getName(), getPhone());
+			// restaurant.setName("MK", mk_name);
+			// restaurant.setName("EN", en_name);
 			getRestaurantManager().addRestaurant(restaurant);
 			JOptionPane.showMessageDialog(contentPane,"The restaurant has been successfuly created","INFO",JOptionPane.INFORMATION_MESSAGE);
 			emptyFields();

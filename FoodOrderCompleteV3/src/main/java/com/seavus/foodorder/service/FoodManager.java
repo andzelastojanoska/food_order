@@ -20,5 +20,7 @@ public interface FoodManager {
 	
 	public void updateFood(String name, String type, double price, Restaurant restaurant, Food food);
 	
+	public void updateFood(String name, String type, double price, String language, String localisedName, String localisedType, Restaurant restaurant, Food food);
+	
 	public Food getFoodForRestaurantByName(String name, Restaurant restaurant);
 }

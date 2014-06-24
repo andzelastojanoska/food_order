@@ -78,8 +78,8 @@ public class FoodManagerImpl implements FoodManager {
 	@Override
 	public void updateFood(String name, String type, double price,
 			Restaurant restaurant, Food food) {
-		food.setName("EN", name);
-		food.setType("EN", type);
+		food.setName(name);
+		food.setType(type);
 		food.setPrice(price);
 		food.setRestaurant(restaurant);
 		try {
@@ -90,6 +90,24 @@ public class FoodManagerImpl implements FoodManager {
 			// handle exception
 		}
 		
+	}
+	
+	@Override
+	public void updateFood(String name, String type, double price, String language, String localisedName, String localisedType, Restaurant restaurant, Food food) {
+		
+		food.setName(name);
+		food.setType(type);
+		food.setPrice(price);
+		food.setRestaurant(restaurant);
+		food.setName(language, localisedName);
+		food.setType(language, localisedType);
+		try {
+			HibernateUtil.beginTransaction();
+			foodDAO.merge(food);
+			HibernateUtil.commitTransaction();
+		} catch (HibernateException e) {
+			// handle exception
+		}
 	}
 
 	@Override

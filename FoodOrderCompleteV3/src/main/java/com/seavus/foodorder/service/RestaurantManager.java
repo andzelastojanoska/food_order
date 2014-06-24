@@ -15,6 +15,8 @@ public interface RestaurantManager {
 	
 	public void updateRestaurant(String name, String phoneNumber, Restaurant restaurant);
 	
+	public void updateRestaurant(String name, String phoneNumber, String language, String localisedName, Restaurant restaurant);
+	
 	public void deleteRestaurant(Restaurant restaurant);
 	
 	public Restaurant getRestaurantForFood(Food food);
