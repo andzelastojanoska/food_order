@@ -89,6 +89,7 @@ public class WelcomePanel extends JFrame {
 								}
 							}
 						});
+<<<<<<< HEAD
 						
 					} else if(employee.getRole().getRole().equals("Admin")){
 						EventQueue.invokeLater(new Runnable() {
@@ -102,6 +103,10 @@ public class WelcomePanel extends JFrame {
 							}
 						});
 						
+=======
+					} else {
+						JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), labels.getString("WelcomePanel.Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+>>>>>>> da98eaafb93bda7e0e7aba6a3d420601f771e518
 					}
 				} else {
 					JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), "ERROR", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
