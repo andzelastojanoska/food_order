@@ -86,7 +86,7 @@ public class WelcomePanel extends JFrame {
 							}
 						});
 					} else {
-						JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), "ERROR", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+						JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), labels.getString("WelcomePanel.Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			}
