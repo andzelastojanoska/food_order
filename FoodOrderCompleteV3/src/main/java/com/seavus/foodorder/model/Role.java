@@ -3,6 +3,7 @@ package com.seavus.foodorder.model;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -18,7 +19,7 @@ public class Role {
       
     private String role;  
       
-    @OneToMany(mappedBy = "role")  
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)  
     private List<Employee> employees;  
     
     public Role() {}

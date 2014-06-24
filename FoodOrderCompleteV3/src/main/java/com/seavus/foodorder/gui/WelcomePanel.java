@@ -17,12 +17,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.service.EmployeeManagerImpl;
 
 @SuppressWarnings("serial")
@@ -32,7 +35,7 @@ public class WelcomePanel extends JFrame {
 	private JPanel centralPanel;
 	private JPanel northPanel;
 	private JTextField userField;
-	private JTextField passField;
+	private JPasswordField passField;
 	private JButton loginButton;
 	private JButton mkLangButton;
 	private JButton enLangButton;
@@ -42,57 +45,124 @@ public class WelcomePanel extends JFrame {
 	private EmployeeManagerImpl employeeManager;
 	private GridBagConstraints gbc;
 
-	Locale locale = new Locale("mk", "MK"); //$NON-NLS-1$ //$NON-NLS-2$
-	final ResourceBundle labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.WelcomePanelMessages", locale); //$NON-NLS-1$
+	private Locale locale; //$NON-NLS-1$ //$NON-NLS-2$
+	private ResourceBundle labels; //$NON-NLS-1$
 	//2 flags in buttons to be implemented, on press locale is changed
 	
-	public WelcomePanel() {		
+	public WelcomePanel() {				
+		initializeWelcomePanel();
+		addActionListeners();
+	}
+	
+	private void initializeWelcomePanel() {
 		setLookAndFeel();
+		setLocale("en", "EN");
+		setResourceBundle();
 		setTitle(labels.getString("WelcomePanel.Title")); //$NON-NLS-1$
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 500, 250);
+		setBounds(100, 100, 500, 250);		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout());
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
-		fillContentPane();
-		
+		fillContentPane();		
 		this.getRootPane().setDefaultButton(getLoginButton());
-
+		
+	}
+	
+	private void addActionListeners() {
 		getLoginButton().addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (getUsername().equals("admin") && getPassword().equals("admin")) { //$NON-NLS-1$ //$NON-NLS-2$
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							try {
-								AdminMainPanel frame = new AdminMainPanel(); // add constructor that takes locale as parameter
-								frame.setVisible(true);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					});
-				} else {
-					if (getEmployeeManager().checkEmployee(getUsername(), getPassword())) {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {	
+				if(getEmployeeManager().checkEmployee(getUsername(), getPassword())) {
+					Employee employee = getEmployeeManager().findByEmployeeUsername(getUsername());
+					if(employee.getRole().getRole().equals("Employee")) {
 						EventQueue.invokeLater(new Runnable() {
 							public void run() {
 								try {
-									OrderPanel orderPanel = new OrderPanel(getUsername(), getPassword()); // add constructor that takes locale as parameter
+									OrderPanel orderPanel = new OrderPanel(getUsername(), getPassword());
 									orderPanel.setVisible(true);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
 							}
 						});
-					} else {
-						JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), "ERROR", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
+						
+					} else if(employee.getRole().getRole().equals("Admin")){
+						EventQueue.invokeLater(new Runnable() {
+							public void run() {
+								try {
+									AdminMainPanel adminPanel = new AdminMainPanel();
+									adminPanel.setVisible(true);
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+						});
+						
 					}
+				} else {
+					JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), "ERROR", JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
 				}
+			}
+		});
+		
+		getMkButton().addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setLocale("mk", "MK");	
+				setResourceBundle();
+				reinitializeTitles();
+				repaint();
+			}
+		});
+		
+		getEnButton().addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setLocale("en", "EN");	
+				setResourceBundle();
+				reinitializeTitles();
+				repaint();				
+			}
+		});
+	}
+	
+	private void reinitializeTitles() {
+		this.setTitle(labels.getString("WelcomePanel.Title"));
+		getLoginButton().setText((labels.getString("WelcomePanel.EnterButton")).toUpperCase());
+		getUsernameLabel().setText(labels.getString("WelcomePanel.UsernameLabel"));
+		getPasswordLabel().setText(labels.getString("WelcomePanel.PasswordLabel"));
+		getWelcomeLabel().setText((labels.getString("WelcomePanel.WelcomeLabel")).toUpperCase());
+	}
+	
+	public void repaint() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				contentPane.revalidate();
+				contentPane.repaint();
 			}
 		});
 	}
 
+	private void setLocale(String lang, String country) {
+		locale = new Locale(lang, country);				
+	}
+	
+	public Locale getLocale() {
+		return this.locale;
+	}
+	
+	private void setResourceBundle() {
+		labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.WelcomePanelMessages", getLocale());
+	}
+	
 	private static String getLookAndFeelClassName(String nameSnippet) {
 		LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
 		for (LookAndFeelInfo info : plafs) {
@@ -144,6 +214,7 @@ public class WelcomePanel extends JFrame {
 		getGBC().fill = GridBagConstraints.HORIZONTAL;
 		getGBC().gridwidth = 1;
 		getCentralPanel().add(getUserField(), getGBC());
+		getUserField().requestFocusInWindow();
 		
 		getGBC().gridx = 0;
 		getGBC().gridy = 2;
@@ -221,9 +292,9 @@ public class WelcomePanel extends JFrame {
 	}
 	
 	
-	private JTextField getPassField() {
+	private JPasswordField getPassField() {
 		if(this.passField == null) {
-			passField = new JTextField(15);
+			passField = new JPasswordField(15);
 		}
 		return passField;
 	}

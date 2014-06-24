@@ -9,12 +9,11 @@ public class FoodOrderApp {
 
 	public static void main(String[] args) {
 
+		FillDatabase.fillRole();
 		FillDatabase.fillEmployee();
 		FillDatabase.fillRestaurant();
 		FillDatabase.fillFood();
-		FillDatabase.fillRole();
-
-
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
