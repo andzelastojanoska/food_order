@@ -5,9 +5,10 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.TableColumn;
 
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Food;
@@ -135,7 +137,9 @@ public class AllOrdersPanel extends JFrame {
 		contentPane.add(getEmployeesOrdersPanel(), getGBC());
 		
 		getGBC().gridy = 4;
-		contentPane.add(getOrderButton(), getGBC());		
+		getGBC().insets = new Insets(10, 50, 10, 50);
+		contentPane.add(getOrderButton(), getGBC());
+		getGBC().insets = new Insets(0, 0, 0, 0);
 	}
 	
 	private JButton getOrderButton() {
@@ -144,14 +148,15 @@ public class AllOrdersPanel extends JFrame {
 		}		
 		return orderButton;
 	}
-
 	
 	public void fillEmployeeOrdersPanel() {
 		Employee employee = getEmployeeManager().findByEmployeeUsername(username);
-		List<Order> employeeOrders = getOrderManager().getOrdersForEmployee(employee);
+		List<Order> employeeOrders = new ArrayList<>();
+		employeeOrders = getOrderManager().getOrdersForEmployee(employee);
 		getEmployeesOrdersPanel().setLayout(new GridBagLayout());
+		getGBC().insets = new Insets(10, 10, 10, 10);
 
-		if (employeeOrders.size() == 0) {
+		if (employeeOrders == null) {
 			JLabel message = new JLabel(labels.getString("AllOrdersPanel.NothingOrdered")); //$NON-NLS-1$
 			getGBC().gridx = 0;
 			getGBC().gridy = 0;
@@ -178,9 +183,10 @@ public class AllOrdersPanel extends JFrame {
 			}
 			JTable employeeOrdersTable = new JTable(orderData, columnNames);
 			employeeOrdersTable.setFont(new Font("Arial", Font.PLAIN, 14));
+			setColumnWidthsForFoodsTable(employeeOrdersTable);
 			
 			JScrollPane scrollPane = new JScrollPane(employeeOrdersTable);
-			employeeOrdersTable.setPreferredScrollableViewportSize(new Dimension(300, 70));	
+			employeeOrdersTable.setPreferredScrollableViewportSize(new Dimension(400, 70));	
 							
 			getGBC().gridx = 0;
 			getGBC().gridy = 0;
@@ -188,15 +194,30 @@ public class AllOrdersPanel extends JFrame {
 			getGBC().gridwidth = 1;
 			getEmployeesOrdersPanel().add(scrollPane);
 		}
+		getGBC().insets = new Insets(0, 0, 0, 0);
+	}
+	
+	private void setColumnWidthsForFoodsTable(JTable foodsTable) {
+		TableColumn column = null;
+		column = foodsTable.getColumnModel().getColumn(0);
+	    column.setPreferredWidth(100);	
+	    column = foodsTable.getColumnModel().getColumn(1);
+	    column.setPreferredWidth(200);	
+	    column = foodsTable.getColumnModel().getColumn(2);
+	    column.setPreferredWidth(100);	
 	}
 
 	public void fillTodaysOrdersPanel() {
 		List<Order> todaysOrders = getOrderManager().getOrdersForDate(new Date());
 		getTodaysOrdersPanel().setLayout(new GridBagLayout());
+		
+		getGBC().insets = new Insets(10, 10, 10, 10);
 
 		if (todaysOrders.size() == 0) {
 			JLabel message = new JLabel(labels.getString("AllOrdersPanel.NoOrdersForToday")); //$NON-NLS-1$
-			contentPane.add(message);
+			getGBC().gridx = 0;
+			getGBC().gridy = 0;
+			getTodaysOrdersPanel().add(message, getGBC());
 		} else {
 			String[] columnNames = {labels.getString("AllOrdersPanel.Date1"),labels.getString("AllOrdersPanel.Food1"),labels.getString("AllOrdersPanel.Employee")};
 			String[] todayRow;
@@ -220,9 +241,10 @@ public class AllOrdersPanel extends JFrame {
 			
 			JTable todaysOrdersTable = new JTable(todayData, columnNames);
 			todaysOrdersTable.setFont(new Font("Arial", Font.PLAIN, 14));
+			setColumnWidthsForFoodsTable(todaysOrdersTable);
 			
 			JScrollPane scrollPane = new JScrollPane(todaysOrdersTable);
-			todaysOrdersTable.setPreferredScrollableViewportSize(new Dimension(300, 70));	
+			todaysOrdersTable.setPreferredScrollableViewportSize(new Dimension(400, 70));				
 							
 			getGBC().gridx = 0;
 			getGBC().gridy = 0;
@@ -230,10 +252,9 @@ public class AllOrdersPanel extends JFrame {
 			getGBC().gridwidth = 1;
 			getTodaysOrdersPanel().add(scrollPane);
 		}
+		getGBC().insets = new Insets(0, 0, 0, 0);
 	}
 
-	
-	
 	private JPanel getTodaysOrdersPanel() {
 		if(todaysOrdersPanel == null) {
 			todaysOrdersPanel = new JPanel();
@@ -241,6 +262,7 @@ public class AllOrdersPanel extends JFrame {
 		return todaysOrdersPanel;
 	}
 	
+
 	private JPanel getEmployeesOrdersPanel() {
 		if(employeesOrdersPanel == null) {
 			employeesOrdersPanel = new JPanel();
@@ -248,13 +270,16 @@ public class AllOrdersPanel extends JFrame {
 		return employeesOrdersPanel;
 	}	
 	
+	
 	private void setResourceBundle() {
 		this.labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.AllOrdersPanelMessages", getLocale());
 	}
 	
+	
 	public Locale getLocale() {
 		return this.locale;
 	}
+	
 	
 	private EmployeeManagerImpl getEmployeeManager() {
 		if(employeeManager == null) {
@@ -269,6 +294,7 @@ public class AllOrdersPanel extends JFrame {
 		}
 		return orderManager;
 	}
+	
 	
 	private FoodManagerImpl getFoodManager() {
 		if(foodManager == null) {
