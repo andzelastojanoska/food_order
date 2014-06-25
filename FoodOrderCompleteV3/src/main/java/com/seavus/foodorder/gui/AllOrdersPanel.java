@@ -30,7 +30,6 @@ import com.seavus.foodorder.service.OrderManagerImpl;
 public class AllOrdersPanel extends JFrame {
 
 	private String username;
-	private String password;
 
 	private JPanel contentPane;
 	private JButton order;
@@ -40,9 +39,9 @@ public class AllOrdersPanel extends JFrame {
 	private FoodManagerImpl foodManager = new FoodManagerImpl();
 	
 	Locale locale = new Locale("mk", "MK"); //$NON-NLS-1$ //$NON-NLS-2$
-	final ResourceBundle labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.AllOrdersPanelMessages", locale); //$NON-NLS-1$
+	private ResourceBundle labels;
 
-	public AllOrdersPanel(String username, String password) {
+	public AllOrdersPanel(String username, ResourceBundle labels) {
 		String className = getLookAndFeelClassName("Nimbus"); //$NON-NLS-1$
 		try {
 			UIManager.setLookAndFeel(className);
@@ -54,7 +53,6 @@ public class AllOrdersPanel extends JFrame {
 		
 		setTitle(labels.getString("AllOrdersPanel.Title")); //$NON-NLS-1$
 		this.username = username;
-		this.password = password;
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -158,13 +156,5 @@ public class AllOrdersPanel extends JFrame {
 			}
 			contentPane.add(todaysOrdersPanel);
 		}
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 }
