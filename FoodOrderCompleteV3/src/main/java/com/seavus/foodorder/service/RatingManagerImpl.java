@@ -6,6 +6,7 @@ import com.seavus.foodorder.dao.RatingDAO;
 import com.seavus.foodorder.dao.RatingDAOImpl;
 import com.seavus.foodorder.hibernateutil.HibernateUtil;
 import com.seavus.foodorder.model.Rating;
+import com.seavus.foodorder.model.Restaurant;
 
 public class RatingManagerImpl implements RatingManager {
 
@@ -21,6 +22,22 @@ public class RatingManagerImpl implements RatingManager {
             System.out.println("Handle error here");
             HibernateUtil.rollbackTransaction();
         }
+	}
+
+	@Override
+	public double getRestaurantRating(Restaurant restaurant) {
+		
+		double rating = 0;
+		
+		try {
+            HibernateUtil.beginTransaction();
+            rating = ratingDAO.getRestaurantRating(restaurant);
+            HibernateUtil.commitTransaction();
+        } catch (HibernateException ex) {
+            System.out.println("Handle error here");
+            HibernateUtil.rollbackTransaction();
+        }
+		return rating;
 	}
 
 }

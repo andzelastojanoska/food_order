@@ -30,7 +30,7 @@ public class MailSender {
             // Trigger the job to run now, and then repeat every 40 seconds
             CronTrigger trigger = newTrigger()
             	    .withIdentity("trigger3", "group1")
-            	    .withSchedule(cronSchedule("0 24 16 * * ?"))
+            	    .withSchedule(cronSchedule("0 0 10 * * ?"))
             	    .forJob("job1", "group1")
             	    .build();
 
