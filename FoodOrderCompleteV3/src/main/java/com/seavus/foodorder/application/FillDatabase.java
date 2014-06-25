@@ -28,8 +28,8 @@ public class FillDatabase {
 			tx = session.beginTransaction();
 			Role employeeRole = roleManager.getRole("Employee");
 			Role adminRole = roleManager.getRole("Admin");
-			Employee employee1 = new Employee("andzela", "stojanoska", "andzela@seavus.com", employeeRole);
-			Employee employee2 = new Employee("martin", "pehcheski", "martin@seavus.com", employeeRole);
+			Employee employee1 = new Employee("andzela", "stojanoska", "Andzela.Stojanoska@seavus.com", employeeRole);
+			Employee employee2 = new Employee("martin", "pehcheski", "Martin.Pehcheski@seavus.com", employeeRole);
 			Employee employee3 = new Employee("admin", "admin", "admin@admin.com", adminRole);
 			session.save(employee1);
 			session.save(employee2);

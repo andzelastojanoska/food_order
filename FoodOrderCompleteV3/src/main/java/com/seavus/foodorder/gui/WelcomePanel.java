@@ -79,29 +79,9 @@ public class WelcomePanel extends JFrame {
 				if(getEmployeeManager().checkEmployee(getUsername(), getPassword())) {
 					Employee employee = getEmployeeManager().findByEmployeeUsername(getUsername());
 					if(employee.getRole().getRole().equals("Employee")) {
-						EventQueue.invokeLater(new Runnable() {
-							public void run() {
-								try {
-									OrderPanel orderPanel = new OrderPanel(getUsername(), getPassword());
-									orderPanel.setVisible(true);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						});
-
-						
+						startOrderPanel();						
 					} else if(employee.getRole().getRole().equals("Admin")){
-						EventQueue.invokeLater(new Runnable() {
-							public void run() {
-								try {
-									AdminMainPanel adminPanel = new AdminMainPanel();
-									adminPanel.setVisible(true);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-							}
-						});
+						startAdminPanel();
 					} 
 				} else {
 					JOptionPane.showMessageDialog(contentPane, labels.getString("WelcomePanel.WrongUsernamePassword"), labels.getString("WelcomePanel.Error"), JOptionPane.ERROR_MESSAGE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -132,6 +112,32 @@ public class WelcomePanel extends JFrame {
 		});
 	}
 	
+	private void startOrderPanel() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					OrderPanel orderPanel = new OrderPanel(getUsername(), getLocale());
+					orderPanel.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	private void startAdminPanel() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					AdminMainPanel adminPanel = new AdminMainPanel();
+					adminPanel.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
 	private void reinitializeTitles() {
 		this.setTitle(labels.getString("WelcomePanel.Title"));
 		getLoginButton().setText((labels.getString("WelcomePanel.EnterButton")).toUpperCase());
@@ -157,6 +163,10 @@ public class WelcomePanel extends JFrame {
 	
 	public Locale getLocale() {
 		return this.locale;
+	}
+	
+	public ResourceBundle getLabels() {
+		return labels;
 	}
 	
 	private void setResourceBundle() {

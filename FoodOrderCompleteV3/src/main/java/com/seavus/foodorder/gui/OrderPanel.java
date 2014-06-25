@@ -2,9 +2,13 @@ package com.seavus.foodorder.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Choice;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -24,8 +28,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import com.seavus.foodorder.model.Employee;
@@ -43,33 +47,76 @@ import com.seavus.foodorder.service.RestaurantManagerImpl;
 public class OrderPanel extends JFrame {
 
 	private String username;
-	private String password;
-
 	private JPanel contentPane;
 	private JButton orderButton;
-	private JButton listAllOrders;
+	private JButton listAllOrdersButton;
 	private JPanel northPanel;
 	private JPanel centarPanel;
 	private JPanel southPanel;
 	private Choice restaurantsDropDown;
-	private JLabel note;
+	private JLabel fromLabel;
+	private JLabel noteLabel;
+	private JTextField noteField;
 
-	private RestaurantManagerImpl restaurantManager = new RestaurantManagerImpl();
-	private FoodManagerImpl foodManager = new FoodManagerImpl();
-	private OrderManagerImpl orderManager = new OrderManagerImpl();
-	private EmployeeManagerImpl employeeManager = new EmployeeManagerImpl();
-	private OrderedFoodManagerImpl orderedFoodManager = new OrderedFoodManagerImpl();
+	private RestaurantManagerImpl restaurantManager;
+	private FoodManagerImpl foodManager;
+	private OrderManagerImpl orderManager;
+	private EmployeeManagerImpl employeeManager;
+	private OrderedFoodManagerImpl orderedFoodManager;
+	
+	private GridBagConstraints gbc;
 
 	private List<JCheckBox> foodsCheckBoxes;
 	private List<Food> checkedFood;
 	private List<Food> foodsForRestaurant;
+	private List<String> types;
 	private Order order;
 	
-	Locale locale = new Locale("mk", "MK"); //$NON-NLS-1$ //$NON-NLS-2$
-	final ResourceBundle labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.OrderPanelMessages", locale); //$NON-NLS-1$
+	private Locale locale;
+	private ResourceBundle labels; //$NON-NLS-1$
 
-	public OrderPanel(String username, String password) {
+	public OrderPanel(String username, Locale locale) {
+		this.locale = locale;
+		this.username = username;
+		initializeOrderPanel();		
 		
+		checkedFood = new ArrayList<>();
+	}
+	
+	private void initializeOrderPanel() {		
+		setLookAndFeel();		
+		setResourceBundle();
+		setTitle(labels.getString("OrderPanel.Title"));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 600, 350);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		contentPane.setVisible(true);
+		
+		fillNorthPartBorderLayout();
+		fillSouthPartBorderLayout();
+		fillCentralPartBorderLayout();
+		fillContentPane();
+		addActionListeners();
+	}
+	
+	private void setResourceBundle() {
+		this.labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.OrderPanelMessages", getLocale());
+	}
+	
+	public Locale getLocale() {
+		return this.locale;
+	}
+	
+	private void fillContentPane() {
+		contentPane.add(getCentralPanel(), BorderLayout.CENTER);
+		contentPane.add(getNorthPanel(), BorderLayout.NORTH);
+		contentPane.add(getSouthPanel(), BorderLayout.SOUTH);
+	}
+	
+	private void setLookAndFeel() {
 		String className = getLookAndFeelClassName("Nimbus"); //$NON-NLS-1$
 		try {
 			UIManager.setLookAndFeel(className);
@@ -77,108 +124,9 @@ public class OrderPanel extends JFrame {
 				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
 			e1.printStackTrace();
 		}
-		
-		setTitle(labels.getString("OrderPanel.Title")); //$NON-NLS-1$
-		this.username = username;
-		this.password = password;
-
-		checkedFood = new ArrayList<>();
-
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 674, 300);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
-		setContentPane(contentPane);
-
-		northPanel = new JPanel();
-		northPanel.setLayout(new FlowLayout());
-
-		centarPanel = new JPanel();
-
-		southPanel = new JPanel();
-		southPanel.setLayout(new GridLayout(3, 1));
-
-		fillNorthPartBorderLayout(northPanel);
-		fillSouthPartBorderLayout(southPanel);
-		fillCentralPartBorderLayout(centarPanel);
-
-		contentPane.add(centarPanel, BorderLayout.CENTER);
-		contentPane.add(northPanel, BorderLayout.NORTH);
-		contentPane.add(southPanel, BorderLayout.SOUTH);
-
-		contentPane.setVisible(true);
-
-		restaurantsDropDown.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				fillCentralPartBorderLayout(centarPanel);
-
-				SwingUtilities.invokeLater(new Runnable() {
-
-					@Override
-					public void run() {
-						centarPanel.revalidate();
-						centarPanel.repaint();
-					}
-				});
-
-			}
-		});
-
-		listAllOrders.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							AllOrdersPanel allOrdersPanel = new AllOrdersPanel(
-									OrderPanel.this.username,
-									OrderPanel.this.password);
-							allOrdersPanel.setVisible(true);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				});
-			}
-		});
-
-		orderButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-
-				getCheckedFood();
-				if (checkedFood.size() == 0) {
-					JOptionPane.showMessageDialog(contentPane,
-							labels.getString("OrderPanel.NoFoodChosen")); //$NON-NLS-1$
-				} else {
-
-					Employee employee = employeeManager
-							.findByEmployeeUsername(OrderPanel.this.username);
-					double total = calculateTotal(checkedFood);
-					order = new Order(new Date(), employee, total);
-					if (!note.getText().equals("")) { //$NON-NLS-1$
-						order.setNote(note.getText());
-					}
-					orderManager.saveNewOrder(order);
-					createOrderedFood();
-					emptyLists();
-					JOptionPane.showMessageDialog(contentPane,
-							labels.getString("OrderPanel.OrderSaved")); //$NON-NLS-1$
-				}
-				fillCentralPartBorderLayout(centarPanel);
-				SwingUtilities.invokeLater(new Runnable() {
-
-					@Override
-					public void run() {
-						centarPanel.revalidate();
-						centarPanel.repaint();
-					}
-				});
-			}
-		});
 	}
 	
-	public static String getLookAndFeelClassName(String nameSnippet) {
+	private static String getLookAndFeelClassName(String nameSnippet) {
 	    LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
 	    for (LookAndFeelInfo info : plafs) {
 	        if (info.getName().contains(nameSnippet)) {
@@ -188,6 +136,72 @@ public class OrderPanel extends JFrame {
 	    return null;
 	}
 
+	public void repaint(final Component component) {
+		SwingUtilities.invokeLater(new Runnable() {
+			
+			@Override
+			public void run() {
+				component.revalidate();
+				component.repaint();
+			}
+		});
+	}
+	
+	private void openAllOrdersPanel() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					AllOrdersPanel allOrdersPanel = new AllOrdersPanel(username, locale);
+					allOrdersPanel.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	private void orderAction() {
+		Employee employee = getEmployeeManager().findByEmployeeUsername(OrderPanel.this.username);
+		double total = calculateTotal(checkedFood);
+		order = new Order(new Date(), employee, total);
+		if (!getNote().equals("")) { //$NON-NLS-1$
+			order.setNote(getNote());
+		}
+		getOrderManager().saveNewOrder(order);
+		createOrderedFood();
+		emptyLists();
+		JOptionPane.showMessageDialog(contentPane, labels.getString("OrderPanel.OrderSaved")); //$NON-NLS-1$
+	}
+	
+	private void addActionListeners() {
+		getRestaurantsDropDown().addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				fillCentralPartBorderLayout();
+				repaint(getCentralPanel());
+			}
+		});
+		
+		getListAllOrdersButton().addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				openAllOrdersPanel();
+			}
+		});
+		
+		getOrderButton().addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				getCheckedFood();
+				if (checkedFood.size() == 0) {
+					JOptionPane.showMessageDialog(contentPane, labels.getString("OrderPanel.NoFoodChosen")); //$NON-NLS-1$
+				} else {
+					orderAction();
+				}
+				fillCentralPartBorderLayout();
+				repaint(getCentralPanel());
+			}
+		});		
+	}	
+	
 	public void emptyLists() {
 		List<JCheckBox> checkBoxes = new ArrayList<>();
 		for (JCheckBox cb : foodsCheckBoxes) {
@@ -206,13 +220,15 @@ public class OrderPanel extends JFrame {
 			resFood.add(f);
 		}
 		foodsForRestaurant.removeAll(cFood);
+		
+		setNote("");
 	}
 
 	public void createOrderedFood() {
 		for (int i = 0; i < checkedFood.size(); i++) {
 			OrderedFood orderedFood = new OrderedFood(order, checkedFood.get(i));
 			order.getOrderFoods().add(orderedFood);
-			orderedFoodManager.saveNewOrderedFood(orderedFood);
+			getOrderedFoodManager().saveNewOrderedFood(orderedFood);
 		}
 	}
 
@@ -222,8 +238,7 @@ public class OrderPanel extends JFrame {
 			if (foodsCheckBoxes.get(i).isSelected()) {
 				Food food = null;
 				for (int j = 0; j < foodsForRestaurant.size(); j++) {
-					if (foodsCheckBoxes.get(i).getText()
-							.equals(foodsForRestaurant.get(j).getName("MK"))) {
+					if (foodsCheckBoxes.get(i).getText().equals(foodsForRestaurant.get(j).getName(getLocale().getCountry()))) {
 						food = foodsForRestaurant.get(j);
 					}
 				}
@@ -235,95 +250,250 @@ public class OrderPanel extends JFrame {
 	public double calculateTotal(List<Food> checkedFood) {
 		double total = 0.0;
 		for (int i = 0; i < checkedFood.size(); i++) {
-			total += checkedFood.get(i).getPrice("MK");
+			total += checkedFood.get(i).getPrice(getLocale().getCountry());
 		}
 		return total;
 	}
 
 	public void removeDuplicates(List<String> list) {
 		for (int i = 0; i < list.size(); i++) {
-			for (int j = i + 1; j < list.size(); i++) {
+			for (int j = i + 1; j < list.size(); j++) {
 				if (list.get(i).equals(list.get(j))) {
-					list.remove(i);
+					list.remove(j);
 					break;
 				}
 			}
 		}
 	}
 
-	public void fillCentralPartBorderLayout(JPanel panel) {
-		panel.removeAll();
-		panel.setLayout(new FlowLayout());
-
-		Restaurant restaurant = restaurantManager
-				.getRestaurantObjectForName(restaurantsDropDown
-						.getSelectedItem(), "MK");
-
-		foodsForRestaurant = foodManager.getFoodForRestaurant(restaurant);
-		List<String> types = foodManager.getRestaurantFoodTypes(restaurant, "MK"); //getRestaurantFoodTypes should return translated types
-
-		removeDuplicates(types);
-
-		foodsCheckBoxes = new ArrayList<>();
-		for (int i = 0; i < types.size(); i++) {
-			JPanel typePanel = new JPanel();
-			typePanel.setLayout(new FlowLayout());
-			JLabel type = new JLabel(types.get(i) + ": "); //$NON-NLS-1$
-			typePanel.add(type);
-			for (int j = 0; j < foodsForRestaurant.size(); j++) {
-				if (foodsForRestaurant.get(j).getType("MK").equals(types.get(i))) { // condition should be: foodsForRestaurant.get(j).getType(language)...
-					JCheckBox check = new JCheckBox(foodsForRestaurant.get(j)
-							.getName("MK"));
-					JLabel priceLabel = new JLabel("(" //$NON-NLS-1$
-							+ foodsForRestaurant.get(j).getPrice("MK") + labels.getString("OrderPanel.currency")); //$NON-NLS-1$
-					foodsCheckBoxes.add(check);
-					typePanel.add(check);
-					typePanel.add(priceLabel);
-				}
-			}
-			panel.add(typePanel);
-			typePanel.setVisible(true);
-		}
-	}
-
-	public void fillNorthPartBorderLayout(JPanel panel) {
-		JLabel from = new JLabel(labels.getString("OrderPanel.FromLabel")); //$NON-NLS-1$
-
-		List<Restaurant> allRestaurants = restaurantManager
-				.loadAllRestaurants();
-		restaurantsDropDown = new Choice();
-
+	private void fillRestaurantsDropDown() {
+		List<Restaurant> allRestaurants = getRestaurantManager().loadAllRestaurants();
+		String country = getLocale().getCountry();
 		for (int i = 0; i < allRestaurants.size(); i++) {
-			restaurantsDropDown.add(allRestaurants.get(i).getName("MK"));
+			getRestaurantsDropDown().add(allRestaurants.get(i).getName(country));
 		}
+	}
+	
+	private JPanel getTypePanel(String type) {
+		JPanel typePanel = new JPanel();
+		typePanel.setLayout(new GridBagLayout());
+		List<JCheckBox> typeFoods = new ArrayList<>();
+		List<JLabel> prices = new ArrayList<>();
+		
+			for (int j = 0; j < foodsForRestaurant.size(); j++) {
+				if (foodsForRestaurant.get(j).getType(getLocale().getCountry()).equals(type)) {
+					JCheckBox check = new JCheckBox(foodsForRestaurant.get(j).getName(getLocale().getCountry()));
+					check.setFont(new Font("Arial", Font.PLAIN, 13));
+					JLabel priceLabel = new JLabel("(" + foodsForRestaurant.get(j).getPrice(getLocale().getCountry()) + labels.getString("OrderPanel.currency")); //$NON-NLS-1$
+					priceLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+					foodsCheckBoxes.add(check);
+					typeFoods.add(check);
+					prices.add(priceLabel);				
+				}
+			}		
+			
+			getGBC().gridx = 0;
+			getGBC().gridy = 0;
+			getGBC().fill = GridBagConstraints.HORIZONTAL;
+			getGBC().gridwidth = 2;
+			getGBC().insets = new Insets(5, 5, 5, 5);
+			JLabel typeLabel = new JLabel(type + ": ");
+			typeLabel.setFont(new Font("Arial", Font.BOLD, 14));
+			typePanel.add(typeLabel, getGBC());
+		
+		for(int i = 0; i < typeFoods.size(); i++) {
+			getGBC().gridx = 0;
+			getGBC().gridy = i+1;
+			getGBC().fill = GridBagConstraints.HORIZONTAL;
+			getGBC().gridwidth = 1;
+			typePanel.add(typeFoods.get(i), getGBC());
+			
+			getGBC().gridx = 1;
+			getGBC().gridy = i+1;
+			getGBC().fill = GridBagConstraints.HORIZONTAL;
+			getGBC().gridwidth = 1;
+			typePanel.add(prices.get(i), getGBC());
+		}
+		getGBC().insets = new Insets(0, 0, 0, 0);
+		return typePanel;
+	}
+	
+	public void fillCentralPartBorderLayout() {
+		getCentralPanel().removeAll();
+		getCentralPanel().setLayout(new GridBagLayout());
 
-		panel.add(from);
-		panel.add(restaurantsDropDown);
+		Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(getRestaurantsDropDown().getSelectedItem(), getLocale().getCountry());
+		foodsForRestaurant = getFoodManager().getFoodForRestaurant(restaurant);
+		types = getFoodManager().getRestaurantFoodTypes(restaurant, getLocale().getCountry());
+		removeDuplicates(types);
+		foodsCheckBoxes = new ArrayList<>();
+		
+		GridBagConstraints newGBC = new GridBagConstraints();
+		newGBC.gridy = 1;	
+		newGBC.gridwidth = 1;
+		newGBC.fill = GridBagConstraints.HORIZONTAL;
+		newGBC.insets = new Insets(10, 10, 10, 10);
+		newGBC.anchor = GridBagConstraints.FIRST_LINE_START;
+		for(int i=0; i<types.size(); i++) {
+			newGBC.gridx = i;					
+			getCentralPanel().add(getTypePanel(types.get(i)), newGBC);		
+		}	
 	}
 
-	public void fillSouthPartBorderLayout(JPanel panel) {
-		JPanel firstPanel = new JPanel();
-		firstPanel.setLayout(new FlowLayout());
-
-		JPanel secondPanel = new JPanel();
-		secondPanel.setLayout(new FlowLayout());
-
-		JPanel thirdPanel = new JPanel();
-		thirdPanel.setLayout(new FlowLayout());
-
-		note = new JLabel(labels.getString("OrderPanel.NoteLabel")); //$NON-NLS-1$
-		JTextField noteField = new JTextField(20);
-		orderButton = new JButton(labels.getString("OrderPanel.OrderLabel")); //$NON-NLS-1$
-		listAllOrders = new JButton(labels.getString("OrderPanel.ListOrders")); //$NON-NLS-1$
-
-		firstPanel.add(note);
-		secondPanel.add(noteField);
-		thirdPanel.add(orderButton);
-		thirdPanel.add(listAllOrders);
-
-		panel.add(firstPanel);
-		panel.add(secondPanel);
-		panel.add(thirdPanel);
+	public void fillNorthPartBorderLayout() {
+		fillRestaurantsDropDown();
+		getNorthPanel().setLayout(new FlowLayout());
+		getNorthPanel().add(getFromLabel());
+		getNorthPanel().add(getRestaurantsDropDown());	
 	}
 
+	public void fillSouthPartBorderLayout() {
+		getSouthPanel().setLayout(new GridBagLayout());
+		
+		getGBC().gridx = 0;
+		getGBC().gridy = 0;
+		getGBC().fill = GridBagConstraints.HORIZONTAL;
+		getGBC().gridwidth = 1;
+		getSouthPanel().add(getNoteLabel(), getGBC());
+
+		getGBC().fill = GridBagConstraints.HORIZONTAL;
+		getGBC().gridx = 1;
+		getGBC().gridy = 0;
+		getSouthPanel().add(getNoteField(), getGBC());
+
+		getGBC().gridx = 0;
+		getGBC().gridy = 1;
+		getGBC().fill = GridBagConstraints.HORIZONTAL;
+		getGBC().gridwidth = 2;
+		getGBC().insets = new Insets(5, 70, 10, 70);
+		getSouthPanel().add(getOrderButton(), getGBC());
+		
+		getGBC().gridx = 0;
+		getGBC().gridy = 2;
+		getGBC().fill = GridBagConstraints.HORIZONTAL;
+		getGBC().gridwidth = 2;
+		getGBC().insets = new Insets(0, 70, 5, 70);
+		getSouthPanel().add(getListAllOrdersButton(), getGBC());
+		
+		getGBC().insets = new Insets(0, 0, 0, 0);
+	}
+
+	
+	private JLabel getFromLabel() {
+		if(fromLabel == null) {
+			fromLabel = new JLabel(labels.getString("OrderPanel.FromLabel"));
+			fromLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+		}
+		return fromLabel;
+	}
+	
+	private JLabel getNoteLabel() {
+		if(noteLabel == null) {
+			noteLabel = new JLabel(labels.getString("OrderPanel.NoteLabel"));
+			noteLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+		}
+		return noteLabel;
+	}
+	
+	private Choice getRestaurantsDropDown() {
+		if(restaurantsDropDown == null) {
+			restaurantsDropDown = new Choice();
+			restaurantsDropDown.setFont(new Font("Arial", Font.PLAIN, 15));
+		}
+		return restaurantsDropDown;
+	}
+	
+	private JPanel getSouthPanel() {
+		if(southPanel == null) {
+			southPanel = new JPanel();
+		}
+		return southPanel; 
+	}
+	
+	private JPanel getCentralPanel() {
+		if(centarPanel == null) {
+			centarPanel = new JPanel();
+		}
+		return centarPanel;
+	}
+	
+	private JPanel getNorthPanel() {
+		if(northPanel == null) {
+			northPanel = new JPanel();
+		}
+		return northPanel;
+	}
+	
+	private JTextField getNoteField() {
+		if(noteField == null) {
+			noteField = new JTextField(20);
+		}
+		return noteField;
+	}
+	
+	private String getNote() {
+		return noteField.getText();
+	}
+
+	private void setNote(String note) { 
+		noteField.setText(note);
+	}
+	
+	private JButton getOrderButton() {
+		if(orderButton == null) {
+			orderButton = new JButton((labels.getString("OrderPanel.OrderLabel")).toUpperCase());
+			orderButton.setFont(new Font("Arial", Font.BOLD, 15));
+		}
+		return orderButton;
+	}
+	
+	private JButton getListAllOrdersButton() {
+		if(listAllOrdersButton == null) {
+			listAllOrdersButton = new JButton(labels.getString("OrderPanel.ListOrders").toUpperCase());
+		}
+		return listAllOrdersButton;
+	}
+	
+	private RestaurantManagerImpl getRestaurantManager() {
+		if(restaurantManager == null) {
+			restaurantManager = new RestaurantManagerImpl();
+		}
+		return restaurantManager;
+	}
+	
+	private EmployeeManagerImpl getEmployeeManager() {
+		if(employeeManager == null) {
+			employeeManager = new EmployeeManagerImpl();
+		}
+		return employeeManager;
+	}
+	
+	private FoodManagerImpl getFoodManager() {
+		if(foodManager == null) {
+			foodManager = new FoodManagerImpl();
+		}
+		return foodManager;
+	}
+	
+	private OrderedFoodManagerImpl getOrderedFoodManager() {
+		if(orderedFoodManager == null) {
+			orderedFoodManager = new OrderedFoodManagerImpl();
+		}
+		return orderedFoodManager;
+	}
+	
+	private OrderManagerImpl getOrderManager() {
+		if(orderManager == null) {
+			orderManager = new OrderManagerImpl();
+		}
+		return orderManager;
+	}
+
+	private GridBagConstraints getGBC() {
+		if(gbc == null) {
+			gbc = new GridBagConstraints();
+		}
+		return gbc;
+	}
+	
 }
