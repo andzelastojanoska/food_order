@@ -151,7 +151,7 @@ public class OrderPanel extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					AllOrdersPanel allOrdersPanel = new AllOrdersPanel(username, labels);
+					AllOrdersPanel allOrdersPanel = new AllOrdersPanel(username, locale);
 					allOrdersPanel.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -220,6 +220,8 @@ public class OrderPanel extends JFrame {
 			resFood.add(f);
 		}
 		foodsForRestaurant.removeAll(cFood);
+		
+		setNote("");
 	}
 
 	public void createOrderedFood() {
@@ -236,7 +238,7 @@ public class OrderPanel extends JFrame {
 			if (foodsCheckBoxes.get(i).isSelected()) {
 				Food food = null;
 				for (int j = 0; j < foodsForRestaurant.size(); j++) {
-					if (foodsCheckBoxes.get(i).getText().equals(foodsForRestaurant.get(j).getName("MK"))) {
+					if (foodsCheckBoxes.get(i).getText().equals(foodsForRestaurant.get(j).getName(getLocale().getCountry()))) {
 						food = foodsForRestaurant.get(j);
 					}
 				}
@@ -248,7 +250,7 @@ public class OrderPanel extends JFrame {
 	public double calculateTotal(List<Food> checkedFood) {
 		double total = 0.0;
 		for (int i = 0; i < checkedFood.size(); i++) {
-			total += checkedFood.get(i).getPrice("MK");
+			total += checkedFood.get(i).getPrice(getLocale().getCountry());
 		}
 		return total;
 	}
@@ -295,7 +297,7 @@ public class OrderPanel extends JFrame {
 			getGBC().fill = GridBagConstraints.HORIZONTAL;
 			getGBC().gridwidth = 2;
 			getGBC().insets = new Insets(5, 5, 5, 5);
-			JLabel typeLabel = new JLabel(type + "s: ");
+			JLabel typeLabel = new JLabel(type + ": ");
 			typeLabel.setFont(new Font("Arial", Font.BOLD, 14));
 			typePanel.add(typeLabel, getGBC());
 		
