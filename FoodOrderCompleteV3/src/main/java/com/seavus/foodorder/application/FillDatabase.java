@@ -158,7 +158,11 @@ public class FillDatabase {
 			
 			Food food5 = new Food("Combinated", "Burger", 2.0, restaurant2);
 			food5.setName("EN", "Combinated");
+<<<<<<< HEAD
 			food5.setName("MK", "Комбирниран");
+=======
+			food5.setName("MK", "Комбиниран");
+>>>>>>> 7f8ca4d7631dbc59989c6d9eedfe8e063a39afed
 			food5.setType("EN", "Burger");
 			food5.setType("MK", "Бургер");
 			
@@ -185,7 +189,11 @@ public class FillDatabase {
 			
 			Food food7 = new Food("Baconburger", "Burger", 1.0, restaurant3);
 			food7.setName("EN", "Baconburger");
+<<<<<<< HEAD
 			food7.setName("MK", "Бејкенбургер");
+=======
+			food7.setName("MK", "Бекенбургер");
+>>>>>>> 7f8ca4d7631dbc59989c6d9eedfe8e063a39afed
 			food7.setType("EN", "Burger");
 			food7.setType("MK", "Бургер");
 			
