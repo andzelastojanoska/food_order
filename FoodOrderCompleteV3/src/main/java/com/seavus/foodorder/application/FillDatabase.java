@@ -55,13 +55,13 @@ public class FillDatabase {
 		try {
 			tx = session.beginTransaction();
 			Restaurant restaurant1 = new Restaurant("7ca", "123456");
-			restaurant1.setName("MK", "7Ñ†Ð°");
+			restaurant1.setName("MK", "7ца");
 			restaurant1.setName("EN", "7ca");
 			Restaurant restaurant2 = new Restaurant("Kostarika", "456789");
-			restaurant2.setName("MK", "ÐšÐ¾Ñ�Ñ‚Ð°Ñ€Ð¸ÐºÐ°");
+			restaurant2.setName("MK", "Костарика");
 			restaurant2.setName("EN", "Kostarika");
 			Restaurant restaurant3 = new Restaurant("Royal Burger", "789123");
-			restaurant3.setName("MK", "Ð Ð¾Ñ˜Ð°Ð» Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			restaurant3.setName("MK", "Ројал Бургер");
 			restaurant3.setName("EN", "Royal Burger");
 			session.save(restaurant1);
 			session.save(restaurant2);
@@ -119,21 +119,21 @@ public class FillDatabase {
 			
 			Food food1 = new Food("Hamburger", "Burger", 1.0, restaurant1);
 			food1.setName("EN", "Hamburger");
-			food1.setName("MK", "Ð¥Ð°Ð¼Ð±ÑƒÑ€Ð³ÐµÑ€");
+			food1.setName("MK", "Хамбургер");
 			food1.setType("EN", "Burger");
-			food1.setType("MK", "Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			food1.setType("MK", "Бургер");
 			
 			Food food2 = new Food("Cheeseburger", "Burger", 2.0, restaurant1);
 			food2.setName("EN", "Cheeseburger");
-			food2.setName("MK", "Ð§Ð¸Ð·Ð±ÑƒÑ€Ð³ÐµÑ€");
+			food2.setName("MK", "Чизбургер");
 			food2.setType("EN", "Burger");
-			food2.setType("MK", "Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			food2.setType("MK", "Бургер");
 			
 			Food food3 = new Food("Caesar salad", "Salad", 3.0, restaurant1);
 			food3.setName("EN", "Caesar salad");
-			food3.setName("MK", "Ð¦ÐµÐ·Ð°Ñ€ Ñ�Ð°Ð»Ð°Ñ‚Ð°");
+			food3.setName("MK", "Цезар салата");
 			food3.setType("EN", "Salad");
-			food3.setType("MK", "Ð¡Ð°Ð»Ð°Ñ‚Ð°");
+			food3.setType("MK", "Салата");
 			
 			Set<Food> foods = new HashSet<>();
 			foods.add(food1);
@@ -152,21 +152,21 @@ public class FillDatabase {
 			
 			Food food4 = new Food("Tost", "Burger", 1.0, restaurant2);
 			food4.setName("EN", "Tost");
-			food4.setName("MK", "Ð¢Ð¾Ñ�Ñ‚");
+			food4.setName("MK", "Тост");
 			food4.setType("EN", "Burger");
-			food4.setType("MK", "Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			food4.setType("MK", "Бургер");
 			
 			Food food5 = new Food("Combinated", "Burger", 2.0, restaurant2);
 			food5.setName("EN", "Combinated");
-			food5.setName("MK", "ÐšÐ¾Ð¼Ð±Ð¸Ð½Ð¸Ñ€Ð°Ð½");
+			food5.setName("MK", "Комбиниран");
 			food5.setType("EN", "Burger");
-			food5.setType("MK", "Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			food5.setType("MK", "Бургер");
 			
 			Food food6 = new Food("Chef salad", "Salad", 3.0, restaurant2);
 			food6.setName("EN", "Chef salad");
-			food6.setName("MK", "Ð¨ÐµÑ„ Ñ�Ð°Ð»Ð°Ñ‚Ð°");
+			food6.setName("MK", "Шеф салата");
 			food6.setType("EN", "Salad");
-			food6.setType("MK", "Ð¡Ð°Ð»Ð°Ñ‚Ð°");
+			food6.setType("MK", "Салата");
 			
 			Set<Food> foods2 = new HashSet<>();
 			foods.add(food4);
@@ -185,21 +185,21 @@ public class FillDatabase {
 			
 			Food food7 = new Food("Baconburger", "Burger", 1.0, restaurant3);
 			food7.setName("EN", "Baconburger");
-			food7.setName("MK", "Ð‘ÐµÐºÐµÐ½Ð±ÑƒÑ€Ð³ÐµÑ€");
+			food7.setName("MK", "Бекенбургер");
 			food7.setType("EN", "Burger");
-			food7.setType("MK", "Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			food7.setType("MK", "Бургер");
 			
 			Food food8 = new Food("Vegetarian sandwich", "Burger", 2.0, restaurant3);
 			food8.setName("EN", "Vegetarian sandwich");
-			food8.setName("MK", "Ð’ÐµÐ³ÐµÑ‚Ð°Ñ€Ð¸Ñ˜Ð°Ð½Ñ�ÐºÐ¸ Ñ�ÐµÐ½Ð´Ð²Ð¸Ñ‡");
+			food8.setName("MK", "Вегетаријански сендвич");
 			food8.setType("EN", "Burger");
-			food8.setType("MK", "Ð‘ÑƒÑ€Ð³ÐµÑ€");
+			food8.setType("MK", "Бургер");
 			
 			Food food9 = new Food("Mixed salad", "Salad", 3.0, restaurant3);
 			food9.setName("EN", "Mixed salad");
-			food9.setName("MK", "ÐœÐµÑˆÐ°Ð½Ð° Ñ�Ð°Ð»Ð°Ñ‚Ð°");
+			food9.setName("MK", "Мешана салата");
 			food9.setType("EN", "Salad");
-			food9.setType("MK", "Ð¡Ð°Ð»Ð°Ñ‚Ð°");
+			food9.setType("MK", "Салата");
 			
 			Set<Food> foods3 = new HashSet<>();
 			foods.add(food7);
