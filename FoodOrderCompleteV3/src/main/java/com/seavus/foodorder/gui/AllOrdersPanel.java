@@ -26,6 +26,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
+import org.apache.log4j.Logger;
+
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Food;
 import com.seavus.foodorder.model.Order;
@@ -51,6 +53,7 @@ public class AllOrdersPanel extends JFrame {
 	
 	private Locale locale;
 	private ResourceBundle labels;
+	private Logger log;
 	
 	private GridBagConstraints gbc;
 
@@ -82,6 +85,7 @@ public class AllOrdersPanel extends JFrame {
 	}
 	
 	private void initializeAllOrdersPanel() {
+		initLogger();
 		setLookAndFeel();
 		setResourceBundle();
 		setTitle(labels.getString("AllOrdersPanel.Title"));
@@ -111,6 +115,17 @@ public class AllOrdersPanel extends JFrame {
 				});
 			}
 		});
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(WelcomePanel.class.getName());
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 	
 	private void fillContentPane() {	

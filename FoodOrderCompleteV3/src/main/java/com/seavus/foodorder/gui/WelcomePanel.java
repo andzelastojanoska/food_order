@@ -25,6 +25,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.service.EmployeeManagerImpl;
 
@@ -47,9 +49,11 @@ public class WelcomePanel extends JFrame {
 
 	private Locale locale; //$NON-NLS-1$ //$NON-NLS-2$
 	private ResourceBundle labels; //$NON-NLS-1$
+	private Logger log;
 	//2 flags in buttons to be implemented, on press locale is changed
 	
 	public WelcomePanel() {				
+		initLogger();
 		initializeWelcomePanel();
 		addActionListeners();
 	}
@@ -68,7 +72,6 @@ public class WelcomePanel extends JFrame {
 		contentPane.setVisible(true);
 		fillContentPane();		
 		this.getRootPane().setDefaultButton(getLoginButton());
-		
 	}
 	
 	private void addActionListeners() {
@@ -159,6 +162,17 @@ public class WelcomePanel extends JFrame {
 
 	private void setLocale(String lang, String country) {
 		locale = new Locale(lang, country);				
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(WelcomePanel.class.getName());
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 	
 	public Locale getLocale() {

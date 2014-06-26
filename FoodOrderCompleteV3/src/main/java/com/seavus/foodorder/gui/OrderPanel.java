@@ -34,6 +34,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Logger;
+
 import com.javaswingcomponents.rater.JSCRater;
 import com.javaswingcomponents.rater.listener.RatingChangeEvent;
 import com.javaswingcomponents.rater.listener.RatingChangeListener;
@@ -86,6 +88,7 @@ public class OrderPanel extends JFrame {
 	
 	private Locale locale;
 	private ResourceBundle labels;
+	private Logger log;
 
 	public OrderPanel(String username, Locale locale) {
 		this.locale = locale;
@@ -93,7 +96,8 @@ public class OrderPanel extends JFrame {
 		initializeOrderPanel();				
 	}
 	
-	private void initializeOrderPanel() {		
+	private void initializeOrderPanel() {
+		initLogger();
 		setLookAndFeel();		
 		setResourceBundle();
 		setTitle(labels.getString("OrderPanel.Title"));
@@ -211,6 +215,17 @@ public class OrderPanel extends JFrame {
 		});		
 				
 	}	
+	
+	private void initLogger() {
+		log = Logger.getLogger(WelcomePanel.class.getName());
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
+	}
 	
 	public void emptyLists() {
 		List<JCheckBox> checkBoxes = new ArrayList<>();
