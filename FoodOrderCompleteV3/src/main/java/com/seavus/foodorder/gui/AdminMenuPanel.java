@@ -32,6 +32,7 @@ public class AdminMenuPanel {
 
 	public AdminMenuPanel(JPanel contentPane) {
 		this.contentPane = contentPane;
+		contentPane.setBounds(100, 100, 600, 400);
 	}
 
 	public void repaint() {

@@ -33,13 +33,14 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 	private JMenuItem foodDeleteMenuItem;
 	private JMenuItem foodUpdateMenuItem;		
 	private JTextField name;
+	private JTextField nameMK;
 	private JTextField type;
+	private JTextField typeMK;
 	private JTextField price;
 	private JComboBox<String> restaurantsCombo;
 	private JComboBox<String> foodsCombo;
 	private JPanel foodPanel;
-	private JPanel chooseFoodPanel;
-	private Food chosenFood;	
+	private JPanel chooseFoodPanel;	
 	private Food foodToUpdate;	
 	private GridBagConstraints gbc;
 	
@@ -65,6 +66,8 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 		name = new JTextField(15);
 		type = new JTextField(15);
 		price = new JTextField(15);
+		nameMK = new JTextField(15);
+		typeMK = new JTextField(15);
 	}
 	
 	public void initializeMenuItems() {
@@ -103,19 +106,6 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 		foodsCombo.setSelectedIndex(-1);
 	}
 	
-	public boolean checkIfFoodIsInRestaurant() {
-		Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName((String)restaurantsCombo.getSelectedItem(), "EN");
-		List<Food> foodForRestaurant = getFoodManager().getFoodForRestaurant(restaurant);		
-		boolean contains = false;
-		for(Food f: foodForRestaurant) {
-			if(name.getText().equals(f.getName())) {
-				contains = true;
-				chosenFood = f;
-			}
-		}
-		return contains;
-	}
-
 	public void fillRestaurantsComboPanel(String titleText) {
 		contentPane.removeAll();
 		repaint();
@@ -194,35 +184,56 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 		gbc.gridy = 0;
 		foodPanel.add(name, gbc);
 		name.setText(foodToUpdate.getName());
-
+		
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		foodPanel.add(new JLabel("Enter new type: ",JLabel.RIGHT), gbc);
+		foodPanel.add(new JLabel("Enter new name (MK): ", JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 1;
+		foodPanel.add(nameMK, gbc);
+		nameMK.setText(foodToUpdate.getName("MK"));
+
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		foodPanel.add(new JLabel("Enter new type: ",JLabel.RIGHT), gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 2;
 		foodPanel.add(type, gbc);
 		type.setText(foodToUpdate.getType());
 		
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 3;
+		foodPanel.add(new JLabel("Enter new type (MK): ",JLabel.RIGHT), gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		foodPanel.add(typeMK, gbc);
+		typeMK.setText(foodToUpdate.getType("MK"));
+		
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 4;
 		foodPanel.add(new JLabel("Enter new price: ",JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
-		gbc.gridy = 2;
+		gbc.gridy = 4;
 		foodPanel.add(price, gbc);
 		price.setText(Double.toString(foodToUpdate.getPrice()));
 
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 5;
 		gbc.gridwidth = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		foodPanel.add(getUpdateButton(), gbc);
 
 		gbc.gridx = 1;
-		gbc.gridy = 3;
+		gbc.gridy = 5;
 		gbc.gridwidth = 1;
 		foodPanel.add(getCancelButton(), gbc);
 		
@@ -254,29 +265,47 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 		gbc.gridy = 0;
 		foodPanel.add(name, gbc);
 		name.requestFocusInWindow();
+		
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		foodPanel.add(new JLabel("Enter name (MK): ",JLabel.RIGHT), gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		foodPanel.add(nameMK, gbc);
 
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 3;
 		foodPanel.add(new JLabel("Enter food type: ",JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
-		gbc.gridy = 1;
+		gbc.gridy = 3;
 		foodPanel.add(type, gbc);
+		
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		foodPanel.add(new JLabel("Enter food type (MK): ",JLabel.RIGHT), gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		foodPanel.add(typeMK, gbc);
 
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 5;
 		foodPanel.add(new JLabel("Enter price: ", JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
-		gbc.gridy = 2;
+		gbc.gridy = 5;
 		foodPanel.add(price, gbc);
 
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = 2;
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 6;
 		foodPanel.add(getCreateButton(), gbc);
 		
 		setDefaultButton(getCreateButton());
@@ -302,11 +331,12 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		foodPanel.add(new JLabel("Enter name: ", JLabel.RIGHT),	gbc);
+		foodPanel.add(new JLabel("Choose food: ", JLabel.RIGHT),	gbc);
 
+		fillComboWithFoodForRestaurant();
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		foodPanel.add(name, gbc);
+		foodPanel.add(foodsCombo, gbc);
 		name.requestFocusInWindow();
 
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -332,10 +362,10 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 			String restaurantName = (String) restaurantsCombo.getSelectedItem();
 			Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(restaurantName, "EN");
 			Food food = new Food(getName(),getType(), foodPrice, restaurant);
-			//food.setName("MK", mk_name);
-			//food.setName("EN", en_name);
-			//food.setType("EN", en_type);
-			//food.setType("MK", mk_type);
+			food.setName("MK", getNameMK());
+			food.setName("EN", getName());
+			food.setType("EN", getType());
+			food.setType("MK", getTypeMK());
 			getFoodManager().addFood(food);
 			JOptionPane.showMessageDialog(contentPane,"Food successfuly created","INFO",JOptionPane.INFORMATION_MESSAGE);										
 			emptyFields();									
@@ -344,10 +374,9 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 	}
 	
 	public void deleteAction() {
-		if (!checkIfFieldIsNotEmpty(name)) {
-			JOptionPane.showMessageDialog(contentPane,"Enter food name", "ERROR",JOptionPane.ERROR_MESSAGE);
+		if (foodsCombo.getSelectedIndex() == -1 && restaurantsCombo.getSelectedIndex() != -1) {
+			JOptionPane.showMessageDialog(contentPane,"Choose food", "ERROR",JOptionPane.ERROR_MESSAGE);
 		} else {						
-			if (checkIfFoodIsInRestaurant()) {
 				final JOptionPane optionPane = new JOptionPane("Are you sure that you want to delete this food?",JOptionPane.QUESTION_MESSAGE,JOptionPane.YES_NO_OPTION);
 				final JDialog dialog = new JDialog((JFrame)SwingUtilities.windowForComponent(contentPane), "Click a button",true);
 				dialog.setContentPane(optionPane);
@@ -368,27 +397,25 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 
 				int value = ((Integer) optionPane.getValue()).intValue();
 				if (value == JOptionPane.YES_OPTION) {
-					getFoodManager().deleteFood(chosenFood);			
+					getFoodManager().deleteFood(getFoodManager().getFoodForRestaurantByName(foodsCombo.getSelectedItem().toString(),getRestaurantManager().getRestaurantObjectForName(restaurantsCombo.getSelectedItem().toString(), "EN")));			
 					
 					JOptionPane.showMessageDialog(contentPane,"The food has been successfuly deleted","INFO",JOptionPane.INFORMATION_MESSAGE);
 					emptyFields();
-					name.requestFocusInWindow();
-					restaurantsCombo.setSelectedIndex(-1);
+		//			foodsCombo.setSelectedIndex(-1);
+					restaurantsCombo.setSelectedIndex(-1);					
 					contentPane.remove(foodPanel);
 					repaint();
 				} else if (value == JOptionPane.NO_OPTION) {
 					dialog.dispose();
+			//		fillRestaurantsComboPanel("DELETE FOOD");
 				}
-			} else {
-				JOptionPane.showMessageDialog(contentPane,"There is no such food in the database","ERROR",JOptionPane.ERROR_MESSAGE);
-			}
 		}
 	}
 
 	public void updateAction() {
 		double foodPrice = 0.0;
 		boolean priceValueIsValid = false;
-		if(!name.getText().equals("") && !type.getText().equals("") && !price.getText().equals("")) {											
+		if(!name.getText().equals("") && !type.getText().equals("") && !price.getText().equals("") && !getNameMK().equals("") && getTypeMK().equals("")) {											
 			try {
 				foodPrice = Double.parseDouble(price.getText());
 				priceValueIsValid = true;
@@ -396,7 +423,8 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 				JOptionPane.showMessageDialog(contentPane,"Enter a valid price (double value)","ERROR",JOptionPane.ERROR_MESSAGE);
 			}
 			if(priceValueIsValid) {
-				getFoodManager().updateFood(getName(), getType(), foodPrice, getRestaurantManager().getRestaurantObjectForName((String)restaurantsCombo.getSelectedItem(), "EN"), foodToUpdate);
+				getFoodManager().updateFood(getName(), getType(), foodPrice, "EN", getName(), getType(),  getRestaurantManager().getRestaurantObjectForName((String)restaurantsCombo.getSelectedItem(), "EN"), foodToUpdate);
+				getFoodManager().updateFood(getName(), getType(), foodPrice, "MK", getNameMK(), getTypeMK(), getRestaurantManager().getRestaurantObjectForName((String)restaurantsCombo.getSelectedItem(), "EN"), foodToUpdate);
 				JOptionPane.showMessageDialog(contentPane,"Food succssefuly updated","INFO",JOptionPane.INFORMATION_MESSAGE);
 				cancelAction();
 			}
@@ -428,7 +456,7 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 
 							@Override
 							public void actionPerformed(ActionEvent arg0) {								
-								if (checkIfFieldIsNotEmpty(name) && checkIfFieldIsNotEmpty(type) && checkIfFieldIsNotEmpty(price)) {
+								if (checkIfFieldIsNotEmpty(name) && checkIfFieldIsNotEmpty(type) && checkIfFieldIsNotEmpty(price) && checkIfFieldIsNotEmpty(nameMK) && checkIfFieldIsNotEmpty(typeMK)) {
 									createAction();
 								} else {
 									JOptionPane.showMessageDialog(contentPane,"Enter name, type and price for the food!","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -450,17 +478,19 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 					
 					@Override
 					public void itemStateChanged(ItemEvent arg0) {
-						fillDeleteFoodPanel();
-						
-						getDeleteButton().addActionListener(new ActionListener() {
-							
-							@Override
-							public void actionPerformed(ActionEvent arg0) {
-								deleteAction();
-							}
-						});												
+						if(restaurantsCombo.getSelectedIndex() != -1) {
+							fillDeleteFoodPanel();
+						}																	
 					}
 				});		
+				
+				getDeleteButton().addActionListener(new ActionListener() {
+					
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						deleteAction();
+					}
+				});	
 			}
 		});
 		
@@ -514,6 +544,8 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 		setName("");
 		setPrice("");
 		setType("");
+		setNameMK("");
+		setTypeMK("");
 	}	
 	
 	public String getName() {
@@ -550,5 +582,21 @@ public class AdminFoodMenuPanel extends AdminMenuPanel implements MenuPanel{
 	
 	public JMenu getMenu(String name) {
 		return new JMenu(name);
+	}
+
+	public String getNameMK() {
+		return nameMK.getText();
+	}
+	
+	public void setNameMK(String text) {
+		nameMK.setText(text);
+	}
+
+	public String getTypeMK() {
+		return typeMK.getText();
+	}
+	
+	public void setTypeMK(String text) {
+		typeMK.setText(text);
 	}
 }
