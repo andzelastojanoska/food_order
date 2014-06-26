@@ -2,6 +2,7 @@ package com.seavus.foodorder.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Choice;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,15 +34,23 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import com.javaswingcomponents.rater.JSCRater;
+import com.javaswingcomponents.rater.listener.RatingChangeEvent;
+import com.javaswingcomponents.rater.listener.RatingChangeListener;
+import com.javaswingcomponents.rater.model.DefaultRaterModel;
+import com.javaswingcomponents.rater.plaf.RaterUI;
+import com.javaswingcomponents.rater.plaf.basic.BasicRaterUI;
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Food;
 import com.seavus.foodorder.model.Order;
 import com.seavus.foodorder.model.OrderedFood;
+import com.seavus.foodorder.model.Rating;
 import com.seavus.foodorder.model.Restaurant;
 import com.seavus.foodorder.service.EmployeeManagerImpl;
 import com.seavus.foodorder.service.FoodManagerImpl;
 import com.seavus.foodorder.service.OrderManagerImpl;
 import com.seavus.foodorder.service.OrderedFoodManagerImpl;
+import com.seavus.foodorder.service.RatingManagerImpl;
 import com.seavus.foodorder.service.RestaurantManagerImpl;
 
 @SuppressWarnings("serial")
@@ -63,8 +73,10 @@ public class OrderPanel extends JFrame {
 	private OrderManagerImpl orderManager;
 	private EmployeeManagerImpl employeeManager;
 	private OrderedFoodManagerImpl orderedFoodManager;
+	private RatingManagerImpl ratingManager;
 	
 	private GridBagConstraints gbc;
+	private JSCRater rater;
 
 	private List<JCheckBox> foodsCheckBoxes;
 	private List<Food> checkedFood;
@@ -73,14 +85,12 @@ public class OrderPanel extends JFrame {
 	private Order order;
 	
 	private Locale locale;
-	private ResourceBundle labels; //$NON-NLS-1$
+	private ResourceBundle labels;
 
 	public OrderPanel(String username, Locale locale) {
 		this.locale = locale;
 		this.username = username;
-		initializeOrderPanel();		
-		
-		checkedFood = new ArrayList<>();
+		initializeOrderPanel();				
 	}
 	
 	private void initializeOrderPanel() {		
@@ -102,14 +112,6 @@ public class OrderPanel extends JFrame {
 		addActionListeners();
 	}
 	
-	private void setResourceBundle() {
-		this.labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.OrderPanelMessages", getLocale());
-	}
-	
-	public Locale getLocale() {
-		return this.locale;
-	}
-	
 	private void fillContentPane() {
 		contentPane.add(getCentralPanel(), BorderLayout.CENTER);
 		contentPane.add(getNorthPanel(), BorderLayout.NORTH);
@@ -124,6 +126,11 @@ public class OrderPanel extends JFrame {
 				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
 			e1.printStackTrace();
 		}
+	}
+	
+	private void changeTheLookAndFeel(JSCRater rater) {
+		RaterUI newUI = BasicRaterUI.createUI(rater);
+		rater.setUI(newUI);
 	}
 	
 	private static String getLookAndFeelClassName(String nameSnippet) {
@@ -176,7 +183,9 @@ public class OrderPanel extends JFrame {
 	private void addActionListeners() {
 		getRestaurantsDropDown().addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
-				fillCentralPartBorderLayout();
+				fillCentralPartBorderLayout();				
+				setRating();
+				addRaterListener();
 				repaint(getCentralPanel());
 			}
 		});
@@ -200,6 +209,7 @@ public class OrderPanel extends JFrame {
 				repaint(getCentralPanel());
 			}
 		});		
+				
 	}	
 	
 	public void emptyLists() {
@@ -233,7 +243,7 @@ public class OrderPanel extends JFrame {
 	}
 
 	public void getCheckedFood() {
-
+		checkedFood = new ArrayList<>();
 		for (int i = 0; i < foodsCheckBoxes.size(); i++) {
 			if (foodsCheckBoxes.get(i).isSelected()) {
 				Food food = null;
@@ -342,11 +352,14 @@ public class OrderPanel extends JFrame {
 
 	public void fillNorthPartBorderLayout() {
 		fillRestaurantsDropDown();
+		initializeRater();	
+		
 		getNorthPanel().setLayout(new FlowLayout());
 		getNorthPanel().add(getFromLabel());
-		getNorthPanel().add(getRestaurantsDropDown());	
+		getNorthPanel().add(getRestaurantsDropDown());
+		getNorthPanel().add(getRater());		
 	}
-
+	
 	public void fillSouthPartBorderLayout() {
 		getSouthPanel().setLayout(new GridBagLayout());
 		
@@ -377,8 +390,45 @@ public class OrderPanel extends JFrame {
 		
 		getGBC().insets = new Insets(0, 0, 0, 0);
 	}
-
 	
+	private void addRaterListener() {
+		getRater().addRatingChangeListener(new RatingChangeListener() {
+			
+			@Override
+			public void ratingChanged(final RatingChangeEvent arg0) {
+				
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						try {
+							BigDecimal newValue = arg0.getNewValue();
+							int rate = newValue.intValueExact();
+							Rating rating = new Rating(rate, getEmployeeManager().findByEmployeeUsername(username), getRestaurantManager().getRestaurantObjectForName(getRestaurantsDropDown().getSelectedItem(), getLocale().getCountry()));
+							getRatingManager().saveRating(rating);
+							setRating();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				});				
+			}
+		});
+	}
+	
+	private void initializeRater() {
+		getRater().setBorder(new EmptyBorder(2,2,2,2));
+		changeTheLookAndFeel(rater);
+		getRater().setMouseOverBorderColor(Color.WHITE);
+		setRating();
+		addRaterListener();
+	}
+	
+	private void setRating() {
+		double rating = getRatingManager().getRestaurantRating(getRestaurantManager().getRestaurantObjectForName(getRestaurantsDropDown().getSelectedItem(), getLocale().getCountry()));
+		DefaultRaterModel raterModel = new DefaultRaterModel();
+		raterModel.setRating(BigDecimal.valueOf(rating));		
+		getRater().setRaterModel(raterModel);
+	}
+
 	private JLabel getFromLabel() {
 		if(fromLabel == null) {
 			fromLabel = new JLabel(labels.getString("OrderPanel.FromLabel"));
@@ -489,6 +539,13 @@ public class OrderPanel extends JFrame {
 		return orderManager;
 	}
 
+	private RatingManagerImpl getRatingManager() {
+		if(ratingManager == null) {
+			ratingManager = new RatingManagerImpl();
+		}
+		return ratingManager;
+	}
+	
 	private GridBagConstraints getGBC() {
 		if(gbc == null) {
 			gbc = new GridBagConstraints();
@@ -496,4 +553,18 @@ public class OrderPanel extends JFrame {
 		return gbc;
 	}
 	
+	private JSCRater getRater() {
+		if(rater == null) {
+			rater = new JSCRater();
+		}
+		return rater;
+	}
+
+	private void setResourceBundle() {
+		this.labels = ResourceBundle.getBundle("com.seavus.foodorder.i18n.OrderPanelMessages", getLocale());
+	}
+	
+	public Locale getLocale() {
+		return this.locale;
+	}
 }
