@@ -1,13 +1,16 @@
 package com.seavus.foodorder.gui;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,9 +31,11 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 	private JMenuItem restaurantAddMenuItem;
 	private JMenuItem restaurantDeleteMenuItem;
 	private JMenuItem restautantUpdateMenuItem;
+	private JComboBox<String> restaurantsCombo;
 	private JTextField name;
+	private JTextField nameMK;
 	private JTextField phone;
-	private JTextField nameToUpdate;	
+	private JTextField nameToUpdate;
 	private JPanel updateRestaurantPanel;
 	private GridBagConstraints gbc;
 
@@ -49,6 +54,7 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		initializeMenuItems();
 		fillMenu();
 		initializeTextFileds();
+		initializeRestaurantsCombo();
 		addMenuListeners();
 	}
 
@@ -56,6 +62,7 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		name = new JTextField(15);
 		phone = new JTextField(15);
 		nameToUpdate = new JTextField(15);
+		nameMK = new JTextField(15);
 	}
 
 	private void initializeMenuItems() {
@@ -97,14 +104,23 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
 		gbc.gridy = 2;
-		contentPane.add(new JLabel("Enter phone number: ", JLabel.RIGHT), gbc);
+		contentPane.add(new JLabel("Enter name (MK): ", JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 2;
+		contentPane.add(nameMK, gbc);
+		
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		contentPane.add(new JLabel("Enter phone number: ", JLabel.RIGHT), gbc);
+
+		gbc.gridx = 1;
+		gbc.gridy = 3;
 		contentPane.add(phone, gbc);
 		
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 4;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridwidth = 2;
 		contentPane.add(getCreateButton(), gbc);
@@ -129,12 +145,13 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		contentPane.add(new JLabel("Enter name: "), gbc);
+		contentPane.add(new JLabel("Choose restaurant: "), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		contentPane.add(name, gbc);
-
+		contentPane.add(getRestaurantsCombo(), gbc);
+		getRestaurantsCombo().setSelectedIndex(-1);
+		
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -162,30 +179,22 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		contentPane.add(new JLabel("Enter name: ", JLabel.RIGHT), gbc);
+		contentPane.add(new JLabel("Choose restaurant: ", JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		contentPane.add(nameToUpdate, gbc);
-		nameToUpdate.requestFocusInWindow();
-
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = 2;
-		contentPane.add(getFindButton(), gbc);
-
-		setDefaultButton(getFindButton());
+		contentPane.add(getRestaurantsCombo(), gbc);
+		
 		repaint();
 	}
 	
-	public void fillRestaurantUpdatePanel() {		
-		Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(getNameToUpdate(), "EN");
-		if (restaurant != null) {
-			getFindButton().setEnabled(false);
-			nameToUpdate.setEditable(false);
-			nameToUpdate.setBackground(Color.LIGHT_GRAY);
-			
+	public void fillRestaurantUpdatePanel() {	
+			if(updateRestaurantPanel != null) {
+				contentPane.remove(updateRestaurantPanel);
+			}
+			repaint();
+			Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(getRestaurantsComboSelection(), "EN");
+
 			updateRestaurantPanel = getUpdateRestaurantPanel();
 			gbc.gridx = 0;
 			gbc.gridy = 3;
@@ -207,41 +216,49 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			gbc.gridx = 0;
-			gbc.gridy = 1;
+			gbc.gridy = 2;
+			updateRestaurantPanel.add(new JLabel("Enter new name (MK): ",JLabel.RIGHT), gbc);
+
+			gbc.gridx = 1;
+			gbc.gridy = 2;
+			updateRestaurantPanel.add(nameMK, gbc);
+			nameMK.setText(restaurant.getName("MK"));
+			
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+			gbc.gridx = 0;
+			gbc.gridy = 3;
 			updateRestaurantPanel.add(new JLabel("Enter new phone: ",JLabel.RIGHT), gbc);
 
 			gbc.gridx = 1;
-			gbc.gridy = 1;
+			gbc.gridy = 3;
 			updateRestaurantPanel.add(phone, gbc);
 			phone.setText(restaurant.getPhoneNumber());
 
 			gbc.gridx = 0;
-			gbc.gridy = 2;
+			gbc.gridy = 4;
 			gbc.gridwidth = 1;
 			gbc.fill = GridBagConstraints.HORIZONTAL;
 			updateRestaurantPanel.add(getUpdateButton(), gbc);
 
 			gbc.gridx = 1;
-			gbc.gridy = 2;
+			gbc.gridy = 4;
 			updateRestaurantPanel.add(getCancelButton(), gbc);
 
 			setDefaultButton(getUpdateButton());
-		} else {
-			JOptionPane.showMessageDialog(contentPane,"There is no such restaurant in the database","ERROR",JOptionPane.ERROR_MESSAGE);
-		}
+			repaint();
 	}
 	
 	public void createRestaurantAction() {
-		if (checkIfFieldIsNotEmpty(name) && checkIfFieldIsNotEmpty(phone)) {
+		if (checkIfFieldIsNotEmpty(name) && checkIfFieldIsNotEmpty(phone) && checkIfFieldIsNotEmpty(nameMK)) {
 			Restaurant restaurant = new Restaurant(getName(), getPhone());
-			// restaurant.setName("MK", mk_name);
-			// restaurant.setName("EN", en_name);
+			restaurant.setName("MK", getNameMK());
+			restaurant.setName("EN", getName());
 			getRestaurantManager().addRestaurant(restaurant);
 			JOptionPane.showMessageDialog(contentPane,"The restaurant has been successfuly created","INFO",JOptionPane.INFORMATION_MESSAGE);
 			emptyFields();
 			repaint();
 		} else {
-			JOptionPane.showMessageDialog(contentPane,"Enter name and phone number for the restaurant!","ERROR", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(contentPane,"Enter name, name in Macedonian and phone number for the restaurant!","ERROR", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -267,37 +284,32 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 
 		int value = ((Integer) optionPane.getValue()).intValue();
 		if (value == JOptionPane.YES_OPTION) {
-			Restaurant restaurantObject = getRestaurantManager().getRestaurantObjectForName(getName(), "EN");
+			Restaurant restaurantObject = getRestaurantManager().getRestaurantObjectForName(getRestaurantsComboSelection(), "EN");
 			getRestaurantManager().deleteRestaurant(restaurantObject);
 			JOptionPane.showMessageDialog(contentPane,"The restaurant has been successfuly deleted","INFO",JOptionPane.INFORMATION_MESSAGE);
-			setName("");
-			name.requestFocusInWindow();
+			initializeRestaurantsCombo();
+			fillDeleteRestaurantPanel();
 		} else if (value == JOptionPane.NO_OPTION) {
 			dialog.dispose();
+			getRestaurantsCombo().setSelectedIndex(-1);
 		}
 	}
 	
 	public void cancelAction() {
-		getFindButton().setEnabled(true);
-		nameToUpdate.setEditable(true);
-		nameToUpdate.setBackground(Color.WHITE);
 		contentPane.remove(updateRestaurantPanel);
 		emptyFields();
-		nameToUpdate.requestFocusInWindow();
-		setDefaultButton(getFindButton());
+		getRestaurantsCombo().setSelectedIndex(-1);
 		repaint();
 	}
 	
 	public void updateAction() {
-		Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(getNameToUpdate(), "EN");
-		getRestaurantManager().updateRestaurant(name.getText(),phone.getText(),restaurant);
+		Restaurant restaurant = getRestaurantManager().getRestaurantObjectForName(getRestaurantsComboSelection(), "EN");
+		getRestaurantManager().updateRestaurant(name.getText(), phone.getText(), "MK", nameMK.getText(), restaurant);
+		getRestaurantManager().updateRestaurant(name.getText(), phone.getText(), "EN", name.getText(), restaurant);
 		JOptionPane.showMessageDialog(contentPane,"Restaurant succssefuly updated","INFO",JOptionPane.INFORMATION_MESSAGE);
 		emptyFields();
-		nameToUpdate.setEditable(true);
-		nameToUpdate.setBackground(Color.WHITE);
 		contentPane.remove(updateRestaurantPanel);
-		getFindButton().setEnabled(true);
-		setDefaultButton(getFindButton());
+		getRestaurantsCombo().setSelectedIndex(-1);
 		repaint();
 	}
 	
@@ -329,15 +341,10 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						if (!checkIfFieldIsNotEmpty(name)) {
-							JOptionPane.showMessageDialog(contentPane,"Enter restaurant name", "ERROR",	JOptionPane.ERROR_MESSAGE);
+						if (getRestaurantsCombo().getSelectedIndex() == -1) {
+							JOptionPane.showMessageDialog(contentPane,"Choose restaurant to delete", "ERROR",	JOptionPane.ERROR_MESSAGE);
 						} else {
-							if (getRestaurantManager().getRestaurantObjectForName(getName(), "EN") != null) {
-								deleteRestaurantAction();						
-							} else {
-								JOptionPane.showMessageDialog(contentPane,"There is no such restaurant in the database","ERROR",JOptionPane.ERROR_MESSAGE);
-								setName("");
-							}
+							deleteRestaurantAction();
 						}
 						repaint();
 					}
@@ -350,20 +357,17 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fillRestaurantToUpdatePanel();
-
-				getFindButton().addActionListener(new ActionListener() {
-
+				
+				getRestaurantsCombo().addItemListener(new ItemListener() {
+					
 					@Override
-					public void actionPerformed(ActionEvent e) {
-						if (checkIfFieldIsNotEmpty(nameToUpdate)) {
-							fillRestaurantUpdatePanel();
-						} else {
-							JOptionPane.showMessageDialog(contentPane,"Enter restaurant name", "ERROR",JOptionPane.ERROR_MESSAGE);
-						}
-						repaint();
+					public void itemStateChanged(ItemEvent arg0) {
+						if(getRestaurantsCombo().getSelectedIndex() != -1) {
+							fillRestaurantUpdatePanel();	
+						}							
 					}
 				});
-				
+
 				getCancelButton().addActionListener(new ActionListener() {
 
 					@Override
@@ -376,7 +380,12 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
-						updateAction();
+						if(!getName().equals("") && !getPhone().equals("") && !getNameMK().equals("")) {
+							updateAction();
+						} else {
+							JOptionPane.showMessageDialog(contentPane,"Enter name, name in Macedonian and phone number!", "ERROR",	JOptionPane.ERROR_MESSAGE);
+						}
+						
 					}
 				});
 				
@@ -384,10 +393,32 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		});
 	}
 
+	
+	public void initializeRestaurantsCombo() {
+		getRestaurantsCombo().removeAllItems();
+		List<Restaurant> allRestaurants = getRestaurantManager().loadAllRestaurants();
+		for (Restaurant r : allRestaurants) {
+			getRestaurantsCombo().addItem(r.getName());
+		}
+		getRestaurantsCombo().setSelectedIndex(-1);
+	}
+	
+	public JComboBox<String> getRestaurantsCombo() {
+		if(restaurantsCombo == null) {
+			restaurantsCombo = new JComboBox<String>();
+		}
+		return restaurantsCombo;
+	}
+	
+	public String getRestaurantsComboSelection() {
+		return getRestaurantsCombo().getSelectedItem().toString();
+	}
+	
 	public void emptyFields() {
 		setName("");
 		setPhone("");
 		setNameToUpdate("");
+		setNameMK("");
 	}	
 	
 	public String getName() {
@@ -396,6 +427,14 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 
 	public void setName(String name) {
 		this.name.setText(name);
+	}
+	
+	public String getNameMK() {
+		return nameMK.getText();
+	}
+
+	public void setNameMK(String nameMK) { 
+		this.nameMK.setText(nameMK);
 	}
 
 	public String getPhone() {
