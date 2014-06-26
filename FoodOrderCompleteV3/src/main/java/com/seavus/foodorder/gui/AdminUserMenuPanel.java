@@ -5,10 +5,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,6 +39,7 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 	private JTextField password;
 	private JTextField email;
 	private JTextField usernameToUpdate;	
+	private JComboBox<String> usersCombo;
 	private JRadioButton employeeRadioButton;
 	private JRadioButton adminRadioButton;
 	private ButtonGroup roleRadioButtonGroup;
@@ -57,6 +62,7 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 		fillMenu();
 		initializeTextFileds();
 		initializeRadioButtons();
+		initializeUsersCombo();
 		addMenuListeners();
 	}
 	
@@ -173,11 +179,11 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		contentPane.add(new JLabel("Enter username: "), gbc);
+		contentPane.add(new JLabel("Choose user: "), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		contentPane.add(username, gbc);
+		contentPane.add(getUsersCombo(), gbc);
 
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -207,18 +213,11 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 		gbc.gridwidth = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		contentPane.add(new JLabel("Enter username: ", JLabel.RIGHT), gbc);
+		contentPane.add(new JLabel("Choose user: ", JLabel.RIGHT), gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 1;
-		contentPane.add(usernameToUpdate, gbc);
-		usernameToUpdate.requestFocusInWindow();
-
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = 2;
-		contentPane.add(getFindButton(), gbc);
+		contentPane.add(getUsersCombo(), gbc);
 
 		setDefaultButton(getFindButton());
 		repaint();
@@ -228,12 +227,11 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 		if(updateUserPanel != null) {
 			contentPane.remove(updateUserPanel);
 		}
-		getFindButton().setEnabled(false);
-		usernameToUpdate.setEditable(false);
-		usernameToUpdate.setBackground(Color.LIGHT_GRAY);
+		
+		Employee employee = getEmployeeManager().findByEmployeeUsername(getUsersComboSelection());
 		repaint();
 		updateUserPanel = getUpdateUserPanel();
-		Employee employee = getEmployeeManager().findByEmployeeUsername(getUsernameToUpdate());
+		
 		
 		gbc.gridx = 0;
 		gbc.gridy = 3;
@@ -298,8 +296,6 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
  }
 	
 	public void deleteUserAction() {
-		Employee employee = getEmployeeManager().findByEmployeeUsername(getUsername());
-		if (employee != null) {
 			final JOptionPane optionPane = new JOptionPane("Are you sure that you want to delete this user?", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
 			final JDialog dialog = new JDialog((JFrame)SwingUtilities.windowForComponent(contentPane), "Click a button", true);		
 			
@@ -318,15 +314,14 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 			dialog.setVisible(true);
 			int value = ((Integer) optionPane.getValue()).intValue();
 			if (value == JOptionPane.YES_OPTION) {
-				getEmployeeManager().deleteEmployee(employee);
+				getEmployeeManager().deleteEmployee(getEmployeeManager().findByEmployeeUsername(getUsersComboSelection()));
 				JOptionPane.showMessageDialog(contentPane, "The user has been successfuly deleted", "INFO", JOptionPane.INFORMATION_MESSAGE);
 				emptyFileds();
+				initializeUsersCombo();
 			} else if (value == JOptionPane.NO_OPTION) {
 				dialog.dispose();
 			}
-		} else {
-			JOptionPane.showMessageDialog(contentPane, "There is no such user in the database", "ERROR", JOptionPane.ERROR_MESSAGE);
-		}
+	
 	}
 	
 	public void addUserAction() {
@@ -339,25 +334,19 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 	}
 	
 	public void updateUserAction() {
-		if(!checkIfFieldIsNotEmpty(username) && !checkIfFieldIsNotEmpty(password) && checkIfFieldIsNotEmpty(email)) {
-			JOptionPane.showMessageDialog(contentPane,"Enter username/password/email","ERROR",JOptionPane.ERROR_MESSAGE);
-		} else {	
 			if(isValidEmailAddress(getEmail())) {
-				Employee employee = getEmployeeManager().findByEmployeeUsername(getUsernameToUpdate());
+				Employee employee = getEmployeeManager().findByEmployeeUsername(getUsersComboSelection());
 				getEmployeeManager().updateEmployee(getUsername(),getPassword(),getEmail(),employee.getRole(),employee);
 				JOptionPane.showMessageDialog(contentPane,"User succssefuly updated","INFO",JOptionPane.INFORMATION_MESSAGE);	
 				cancelAction();
 			} else {
 				JOptionPane.showMessageDialog(contentPane,"Enter valid email address!","ERROR",JOptionPane.ERROR_MESSAGE);
-			}
-		}		
+			}				
 	}
 	
 	public void cancelAction() {
 		emptyFileds();
-		getFindButton().setEnabled(true);
-		usernameToUpdate.setEditable(true);
-		usernameToUpdate.setBackground(Color.WHITE);
+		getUsersCombo().setSelectedIndex(-1);
 		fillUsernameToUpdateUserPanel();
 	}
 	
@@ -398,12 +387,12 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 
 					@Override
 					public void actionPerformed(ActionEvent arg0) {
-						if (checkIfFieldIsNotEmpty(username)) {
+						if(getUsersCombo().getSelectedIndex() != -1) {
 							deleteUserAction();
-						} else {							
-							JOptionPane.showMessageDialog(contentPane, "Enter username", "ERROR",JOptionPane.ERROR_MESSAGE);
+							repaint(); 
+						} else {
+							JOptionPane.showMessageDialog(contentPane,"Select user to delete!", "ERROR",JOptionPane.ERROR_MESSAGE);
 						}
-						repaint();
 					}
 				});				
 			}
@@ -413,28 +402,20 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				fillUsernameToUpdateUserPanel();
-
-				getFindButton().addActionListener(new ActionListener() {
-
+				fillUsernameToUpdateUserPanel();				
+				
+				getUsersCombo().addItemListener(new ItemListener() {
+					
 					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						if (checkIfFieldIsNotEmpty(usernameToUpdate)) {
-							if (getEmployeeManager().findByEmployeeUsername(getUsernameToUpdate()) != null) {
-								fillUpdateUserPanel();								
-							} else {
-								JOptionPane.showMessageDialog(contentPane,"There is no such user in the database","ERROR",JOptionPane.ERROR_MESSAGE);
-								setUsernameToUpdate("");
-								usernameToUpdate.requestFocusInWindow();
-							}
+					public void itemStateChanged(ItemEvent arg0) {
+						if(getUsersCombo().getSelectedIndex() == -1) {
+							fillUsernameToUpdateUserPanel();
 						} else {
-							JOptionPane.showMessageDialog(contentPane,"Enter username", "ERROR",JOptionPane.ERROR_MESSAGE);
-							usernameToUpdate.requestFocusInWindow();
-						}
+							fillUpdateUserPanel();
+						}					
 					}
-				});					
-				
-				
+				});
+							
 				getUpdateButton().addActionListener(new ActionListener() {
 
 					@Override
@@ -504,5 +485,25 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 
 	public JMenu getMenu(String title) {
 		return new JMenu(title);
+	}
+
+	public JComboBox<String> getUsersCombo() {
+		if(usersCombo == null) {
+			usersCombo = new JComboBox<String>();
+		}
+		return usersCombo;
+	}
+	
+	public String getUsersComboSelection() {
+		return usersCombo.getSelectedItem().toString();
+	}
+	
+	public void initializeUsersCombo() {
+		getUsersCombo().removeAllItems();
+		List<Employee> users = getEmployeeManager().loadAllEmployees();
+		for(Employee e : users) {
+			getUsersCombo().addItem(e.getUsername());
+		}
+		getUsersCombo().setSelectedIndex(-1);
 	}
 }
