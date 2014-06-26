@@ -24,6 +24,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Role;
 
@@ -44,6 +47,8 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 	private ButtonGroup roleRadioButtonGroup;
 	private JPanel updateUserPanel;
 	private GridBagConstraints gbc;
+	
+	private Logger log;
 
 	public AdminUserMenuPanel(JPanel contentPane, JMenuBar menuBar) {
 		super(contentPane);
@@ -54,6 +59,7 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 
 	@Override
 	public void initializeComponents() {
+		initLogger();
 		gbc = getConstraints();
 		userMenu = getMenu("User");
 		menuBar.add(userMenu);
@@ -63,6 +69,19 @@ public class AdminUserMenuPanel extends AdminMenuPanel implements MenuPanel{
 		initializeRadioButtons();
 		initializeUsersCombo();
 		addMenuListeners();
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(AdminUserMenuPanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("UserFileAppender");
+		log.removeAppender(appender);
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 	
 	public void initializeRadioButtons() {

@@ -22,6 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+
 import com.seavus.foodorder.model.Restaurant;
 
 public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPanel{
@@ -38,6 +41,8 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 	private JTextField nameToUpdate;
 	private JPanel updateRestaurantPanel;
 	private GridBagConstraints gbc;
+	
+	private Logger log;
 
 	public AdminRestaurantMenuPanel(JPanel contentPane, JMenuBar menuBar) {
 		super(contentPane);
@@ -48,6 +53,7 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 	
 	@Override
 	public void initializeComponents() {
+		initLogger();
 		gbc = getConstraints();
 		restaurantMenu = getMenu("Restaurant");
 		menuBar.add(restaurantMenu);
@@ -69,6 +75,19 @@ public class AdminRestaurantMenuPanel extends AdminMenuPanel implements MenuPane
 		restaurantAddMenuItem = new JMenuItem("Add restaurant");
 		restaurantDeleteMenuItem = new JMenuItem("Delete restaurant");
 		restautantUpdateMenuItem = new JMenuItem("Update restaurant");		
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(AdminRestaurantMenuPanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("UserFileAppender");
+		log.removeAppender(appender);
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 	
 	@Override

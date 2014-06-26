@@ -10,6 +10,9 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+
 import com.seavus.foodorder.service.EmployeeManagerImpl;
 import com.seavus.foodorder.service.FoodManagerImpl;
 import com.seavus.foodorder.service.RestaurantManagerImpl;
@@ -29,9 +32,12 @@ public class AdminMenuPanel {
 	private RestaurantManagerImpl restaurantManager;
 	private FoodManagerImpl foodManager;
 	private RoleManagerImpl roleManager;
+	
+	private Logger log;
 
 	public AdminMenuPanel(JPanel contentPane) {
 		this.contentPane = contentPane;
+		initLogger();
 	}
 
 	public void repaint() {
@@ -55,6 +61,19 @@ public class AdminMenuPanel {
 			return false;
 		}
 		return true;
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(AdminMenuPanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("UserFileAppender");
+		log.removeAppender(appender);
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 
 	public JButton getCreateButton() {
