@@ -3,21 +3,27 @@ package com.seavus.foodorder.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Food;
 import com.seavus.foodorder.model.Order;
+import com.seavus.foodorder.model.OrderedFood;
 import com.seavus.foodorder.model.Restaurant;
 import com.seavus.foodorder.service.EmployeeManagerImpl;
 import com.seavus.foodorder.service.FoodManagerImpl;
@@ -28,6 +34,7 @@ public class AdminHomeMenuPanel {
 	
 	private JPanel contentPane;
 	private JMenu homeMenu = new JMenu("Home");
+	private JMenuItem homeListsMenuItem;
 	private JTabbedPane tabbedPane;
 	private JPanel usersPanel;
 	private JPanel restaurantsPanel;
@@ -42,15 +49,24 @@ public class AdminHomeMenuPanel {
 		this.contentPane = contentPane;
 		
 		menuBar.add(homeMenu);
+		initializeMenu();
 		initializeContentPane();
+		addActionListeners();
 	}
 	
 	public void initializeContentPane() {
-		contentPane.setLayout(new BorderLayout());
+		contentPane.removeAll();
+		repaint();
+		contentPane.setLayout(new BorderLayout());		
 		contentPane.add(getTabbedPane());
 		fillTabbedPane();	
 		fillPanels();
 	}	
+	
+	private void initializeMenu() {
+		homeListsMenuItem = new JMenuItem("Lists");
+		homeMenu.add(homeListsMenuItem);	
+	}
 	
 	private void fillPanels() {
 		fillUsersPanel();
@@ -80,6 +96,17 @@ public class AdminHomeMenuPanel {
 			}
 		}
 		return orderedFood;
+	}
+	
+	private Restaurant getRestaurantForOrder(Order order) {
+		Restaurant restaurant = null;
+		Set<OrderedFood> orderedFoods = order.getOrderFoods();
+		for(OrderedFood of : orderedFoods) {
+			restaurant = of.getFood().getRestaurant();
+			break;
+		}		
+		return restaurant;
+		
 	}
 	
 	private List<Food> getAllFoods() {
@@ -120,19 +147,21 @@ public class AdminHomeMenuPanel {
 	    column = ordersTable.getColumnModel().getColumn(2);
 	    column.setPreferredWidth(30);	
 	}
-
 	
-	private void fillOrdersPanel() {		
+	private void fillOrdersPanel() {	
+		getOrdersPanel().removeAll();
+		repaint();
 		List<Order> ordersForToday = getOrdersForToday();
 		if(ordersForToday.size() != 0) {
-		String[] columnNames = {"Employee","Ordered food","Note"};
+		String[] columnNames = {"Employee","Ordered food","Note","Restaurant"};
 		String[] orderRow;
-		Object[][] ordersData = new Object[ordersForToday.size()][3];
+		Object[][] ordersData = new Object[ordersForToday.size()][4];
 		for(int i = 0; i < ordersForToday.size(); i++) {
-			orderRow = new String[3];
+			orderRow = new String[4];
 			orderRow[0] = ordersForToday.get(i).getEmployee().getUsername();
 			orderRow[1] = getAllOrderedFoodString(ordersForToday.get(i));
 			orderRow[2] = ordersForToday.get(i).getNote();
+			orderRow[3] = getRestaurantForOrder(ordersForToday.get(i)).getName();
 			ordersData[i] = orderRow;
 			orderRow = null;
 		}		
@@ -145,7 +174,9 @@ public class AdminHomeMenuPanel {
 		}		
 	}
 
-	private void fillFoodsPanel() {			
+	private void fillFoodsPanel() {		
+		getFoodsPanel().removeAll();
+		repaint();
 		List<Food> foods = getAllFoods();
 		String[] columnNames = {"Name","Type","Price","Restaurant"};
 		String[] foodRow;
@@ -168,6 +199,8 @@ public class AdminHomeMenuPanel {
 	}
 
 	private void fillRestaurantsPanel() {
+		getRestaurantsPanel().removeAll();
+		repaint();
 		List<Restaurant> restaurants = getRestaurantManager().loadAllRestaurants();
 		String[] columnNames = {"Name","Phone number"};
 		String[] restaurantRow;
@@ -190,6 +223,8 @@ public class AdminHomeMenuPanel {
 	}
 
 	private void fillUsersPanel() {
+		getUsersPanel().removeAll();
+		repaint();
 		List<Employee> employees = getEmployeeManager().loadAllEmployees();
 		String[] columnNames = {"Username","E-mail"};
 		String[] employeeRow;
@@ -210,7 +245,29 @@ public class AdminHomeMenuPanel {
 		getUsersPanel().add(scrollPane);
 	}
 	
+	private void addActionListeners() {
+		homeListsMenuItem.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				initializeContentPane();				
+			}
+		});
+	}
+	
+	
+	
+	public void repaint() {
+		SwingUtilities.invokeLater(new Runnable() {
 
+			@Override
+			public void run() {
+				contentPane.revalidate();
+				contentPane.repaint();
+			}
+		});
+	}
+	
 	private JTabbedPane getTabbedPane() {
 		if(tabbedPane == null) {
 			tabbedPane = new JTabbedPane();
