@@ -10,10 +10,10 @@ public class FoodOrderApp {
 
 	public static void main(String[] args) {
 
-		FillDatabase.fillRole();
-		FillDatabase.fillEmployee();
-		FillDatabase.fillRestaurant();
-		FillDatabase.fillFood();
+//		FillDatabase.fillRole();
+//		FillDatabase.fillEmployee();
+//		FillDatabase.fillRestaurant();
+//		FillDatabase.fillFood();
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
