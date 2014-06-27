@@ -2,6 +2,7 @@ package com.seavus.foodorder.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -94,10 +95,11 @@ public class AdminHomeMenuPanel {
 	}
 
 	public void fillTabbedPane() {
+		getTabbedPane().add("Orders", getOrdersPanel());	
 		getTabbedPane().add("Users", getUsersPanel());
 		getTabbedPane().add("Restaurants", getRestaurantsPanel());
 		getTabbedPane().add("Foods", getFoodsPanel());
-		getTabbedPane().add("Orders", getOrdersPanel());		
+			
 	}
 	
 	private String getAllOrderedFoodString(Order o) {
@@ -116,17 +118,6 @@ public class AdminHomeMenuPanel {
 		return orderedFood;
 	}
 	
-	private Restaurant getRestaurantForOrder(Order order) {
-		Restaurant restaurant = null;
-		Set<OrderedFood> orderedFoods = order.getOrderFoods();
-		for(OrderedFood of : orderedFoods) {
-			restaurant = of.getFood().getRestaurant();
-			break;
-		}		
-		return restaurant;
-		
-	}
-	
 	private List<Food> getAllFoods() {
 		List<Restaurant> restaurants = getRestaurantManager().loadAllRestaurants();
 		List<Food> foods = new ArrayList<>();
@@ -137,13 +128,6 @@ public class AdminHomeMenuPanel {
 			}
 		}		
 		return foods;
-	}
-	
-	private List<Order> getOrdersForToday() {
-		Date today = new Date();
-		List<Order> ordersForToday = new ArrayList<>();
-		ordersForToday = getOrderManager().getOrdersForDate(today);
-		return ordersForToday;
 	}
 	
 	private void setColumnWidthsForFoodsTable(JTable foodsTable) {
@@ -166,30 +150,54 @@ public class AdminHomeMenuPanel {
 	    column.setPreferredWidth(30);	
 	}
 	
-	private void fillOrdersPanel() {	
+	private List<Order> getTodaysOrdersForRestaurant(Restaurant restaurant) {
+		List<Order> todaysOrders = getOrderManager().getOrdersForDate(new Date());
+		List<Order> todaysOrdersForRestaurant = new ArrayList<>();
+		for(Order o : todaysOrders) {
+			Set<OrderedFood> orderedFood = o.getOrderFoods();
+			String restaurantName = "";
+			for(OrderedFood of : orderedFood) {
+				restaurantName = of.getFood().getRestaurant().getName();
+				break;
+			}
+			if(restaurant.getName() == restaurantName) {
+				todaysOrdersForRestaurant.add(o);
+			}
+		}
+		return todaysOrdersForRestaurant;
+	}
+	
+	private void fillOrdersPanel() {
 		getOrdersPanel().removeAll();
 		repaint();
-		List<Order> ordersForToday = getOrdersForToday();
-		if(ordersForToday.size() != 0) {
-		String[] columnNames = {"Employee","Ordered food","Note","Restaurant"};
-		String[] orderRow;
-		Object[][] ordersData = new Object[ordersForToday.size()][4];
-		for(int i = 0; i < ordersForToday.size(); i++) {
-			orderRow = new String[4];
-			orderRow[0] = ordersForToday.get(i).getEmployee().getUsername();
-			orderRow[1] = getAllOrderedFoodString(ordersForToday.get(i));
-			orderRow[2] = ordersForToday.get(i).getNote();
-			orderRow[3] = getRestaurantForOrder(ordersForToday.get(i)).getName();
-			ordersData[i] = orderRow;
-			orderRow = null;
-		}		
-		JTable ordersTable = new JTable(ordersData, columnNames);
-		ordersTable.setFont(new Font("Arial", Font.PLAIN, 14));
-		setColumnWidthsForOrdersTable(ordersTable);	
-		JScrollPane scrollPane = new JScrollPane(ordersTable);
-		ordersTable.setPreferredScrollableViewportSize(new Dimension(400, 70));	
-		getOrdersPanel().add(scrollPane);
-		}		
+		getOrdersPanel().setLayout(new FlowLayout());
+		List<Restaurant> allRestaurants = getRestaurantManager().loadAllRestaurants();
+		JScrollPane tablesScrollPane = null;
+		JScrollPane scrollPane = null;
+		for(Restaurant r : allRestaurants) {
+			List<Order> todaysOrdersForRestaurant = getOrderManager().getTodaysOrdersForRestaurant(r);
+			if(todaysOrdersForRestaurant.size() != 0) {
+				String[] columnNames = {"Employee","Ordered food","Note","Restaurant"};
+				String[] orderRow;
+				Object[][] ordersData = new Object[todaysOrdersForRestaurant.size()][4];
+				for(int i = 0; i < todaysOrdersForRestaurant.size(); i++) {
+					orderRow = new String[4];
+					orderRow[0] = todaysOrdersForRestaurant.get(i).getEmployee().getUsername();
+					orderRow[1] = getAllOrderedFoodString(todaysOrdersForRestaurant.get(i));
+					orderRow[2] = todaysOrdersForRestaurant.get(i).getNote();
+					orderRow[3] = r.getName();
+					ordersData[i] = orderRow;
+					orderRow = null;
+				}		
+				JTable ordersTable = new JTable(ordersData, columnNames);
+				ordersTable.setFont(new Font("Arial", Font.PLAIN, 14));
+				setColumnWidthsForOrdersTable(ordersTable);	
+				scrollPane = new JScrollPane(ordersTable);
+				ordersTable.setPreferredScrollableViewportSize(new Dimension(400, 70));	
+				getOrdersPanel().add(scrollPane);
+				}
+		//	tablesScrollPane.add(scrollPane);
+		}
 	}
 
 	private void fillFoodsPanel() {		

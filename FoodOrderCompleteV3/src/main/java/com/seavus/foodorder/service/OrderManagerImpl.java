@@ -65,6 +65,7 @@ public class OrderManagerImpl implements OrderManager {
 			HibernateUtil.commitTransaction();
 		} catch (HibernateException ex) {
 			System.out.println("Hangle error here");
+			ex.printStackTrace();
 		}
 		return orders;
 	}

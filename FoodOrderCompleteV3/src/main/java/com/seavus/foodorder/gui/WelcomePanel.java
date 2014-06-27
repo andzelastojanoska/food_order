@@ -134,6 +134,7 @@ public class WelcomePanel extends JFrame {
 			public void run() {
 				try {
 					AdminMainPanel adminPanel = new AdminMainPanel();
+					adminPanel.getRootPane().setBounds(100, 100, 700, 400);
 					adminPanel.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
