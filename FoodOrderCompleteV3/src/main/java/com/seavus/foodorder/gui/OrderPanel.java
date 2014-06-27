@@ -16,6 +16,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -100,6 +101,20 @@ public class OrderPanel extends JFrame implements Job {
 		initializeOrderPanel();				
 	}
 	
+	public void setRestaurantsDropDown() {
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+		switch (dayOfWeek) {
+			case 2: getRestaurantsDropDown().select(2); break;
+			case 3: getRestaurantsDropDown().select(1); break;
+			case 4: getRestaurantsDropDown().select(0); break;
+			case 5: getRestaurantsDropDown().select(1); break;
+			case 6: getRestaurantsDropDown().select(2); break;
+		}
+		getRestaurantsDropDown().setEnabled(false);
+	}
+	
 	private void initializeOrderPanel() {
 		initLogger();
 		setLookAndFeel();		
@@ -112,6 +127,7 @@ public class OrderPanel extends JFrame implements Job {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		contentPane.setVisible(true);
+		
 		
 		fillNorthPartBorderLayout();
 		fillSouthPartBorderLayout();
@@ -373,6 +389,7 @@ public class OrderPanel extends JFrame implements Job {
 
 	public void fillNorthPartBorderLayout() {
 		fillRestaurantsDropDown();
+		setRestaurantsDropDown();
 		initializeRater();	
 		
 		getNorthPanel().setLayout(new FlowLayout());
