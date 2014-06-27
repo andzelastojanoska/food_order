@@ -27,7 +27,7 @@ public class OrderingEmployeeGetterMailSender {
 			// Trigger the job to run now, and then repeat every 40 seconds
 			CronTrigger trigger = newTrigger()
 					.withIdentity("trigger1", "group1")
-					.withSchedule(cronSchedule("0 29 15 * * ?"))
+					.withSchedule(cronSchedule("0 30 10 * * ?"))
 					.forJob("job2", "group1").build();
 
 			// Tell quartz to schedule the job using our trigger

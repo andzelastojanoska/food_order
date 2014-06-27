@@ -30,7 +30,7 @@ public class HalfHourBeforeOrderNotificationMailSender {
             // Trigger the job to run now, and then repeat every 40 seconds
             CronTrigger trigger = newTrigger()
             	    .withIdentity("trigger3", "group1")
-            	    .withSchedule(cronSchedule("00 29 15 * * ?"))
+            	    .withSchedule(cronSchedule("00 00 10 * * ?"))
             	    .forJob("job1", "group1")
             	    .build();
 

@@ -4,3 +4,4 @@
 target/
 FoodOrderCompleteV3/foodadminister.log
 FoodOrderCompleteV3/foodorder.log
+FoodOrderCompleteV3/src/main/resources/hibernate.properties
