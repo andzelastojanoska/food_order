@@ -2,9 +2,11 @@ package com.seavus.foodorder.application;
 
 import java.awt.EventQueue;
 
-import com.seavus.foodorder.emailsender.MailSender;
+import com.seavus.foodorder.emailsender.HalfHourBeforeOrderNotificationMailSender;
+import com.seavus.foodorder.emailsender.OrderingEmployeeGetterMailSender;
 import com.seavus.foodorder.gui.WelcomePanel;
 import com.seavus.foodorder.hibernateutil.HibernateUtil;
+import com.seavus.foodorder.orderbuttondisabler.OrderButtonDisabler;
 
 public class FoodOrderApp {
 
@@ -20,7 +22,9 @@ public class FoodOrderApp {
 				try {
 					WelcomePanel welcomePanel = new WelcomePanel();
 					welcomePanel.setVisible(true);
-					MailSender.start();
+					HalfHourBeforeOrderNotificationMailSender.start();
+					OrderingEmployeeGetterMailSender.start();
+					OrderButtonDisabler.start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

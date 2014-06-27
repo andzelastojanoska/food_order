@@ -36,6 +36,9 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 import com.javaswingcomponents.rater.JSCRater;
 import com.javaswingcomponents.rater.listener.RatingChangeEvent;
@@ -57,7 +60,7 @@ import com.seavus.foodorder.service.RatingManagerImpl;
 import com.seavus.foodorder.service.RestaurantManagerImpl;
 
 @SuppressWarnings("serial")
-public class OrderPanel extends JFrame {
+public class OrderPanel extends JFrame implements Job {
 
 	private String username;
 	private JPanel contentPane;
@@ -584,5 +587,16 @@ public class OrderPanel extends JFrame {
 	
 	public Locale getLocale() {
 		return this.locale;
+	}
+
+	@Override
+	public void execute(JobExecutionContext context)
+			throws JobExecutionException {
+
+		System.out.println("order button disabled");
+		
+		getOrderButton().setEnabled(false);
+		repaint();
+		
 	}
 }

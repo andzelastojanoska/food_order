@@ -10,7 +10,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 
-public class MailSender {
+public class HalfHourBeforeOrderNotificationMailSender {
 
 	public static void start() {
 		
@@ -23,20 +23,36 @@ public class MailSender {
 
             
          // define the job and tie it to our HelloJob class
-            JobDetail job = JobBuilder.newJob(EmailJob.class)
+            JobDetail job = JobBuilder.newJob(HalfHourBeforeOrderNotification.class)
                 .withIdentity("job1", "group1")
                 .build();
 
             // Trigger the job to run now, and then repeat every 40 seconds
             CronTrigger trigger = newTrigger()
             	    .withIdentity("trigger3", "group1")
-            	    .withSchedule(cronSchedule("0 0 10 * * ?"))
+            	    .withSchedule(cronSchedule("00 29 15 * * ?"))
             	    .forJob("job1", "group1")
             	    .build();
 
             // Tell quartz to schedule the job using our trigger
             scheduler.scheduleJob(job, trigger);
             
+            
+         // define the job and tie it to our HelloJob class
+//            JobDetail job2 = JobBuilder.newJob(OrderingEmployeeGetter.class)
+//                .withIdentity("job2", "group2")
+//                .build();
+//
+//            // Trigger the job to run now, and then repeat every 40 seconds
+//            CronTrigger trigger2 = newTrigger()
+//            	    .withIdentity("trigger2", "group2")
+//            	    .withSchedule(cronSchedule("0 58 13 * * ?"))
+//            	    .forJob("job2", "group2")
+//            	    .build();
+//
+//            // Tell quartz to schedule the job using our trigger
+//            scheduler.scheduleJob(job2, trigger2);
+//            
 //            Thread.sleep(60000);
             
 //            scheduler.shutdown();

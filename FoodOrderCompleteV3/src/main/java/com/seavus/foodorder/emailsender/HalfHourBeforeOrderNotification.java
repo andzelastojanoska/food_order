@@ -9,7 +9,7 @@ import org.quartz.JobExecutionException;
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.service.EmployeeManagerImpl;
 
-public class EmailJob implements Job {
+public class HalfHourBeforeOrderNotification implements Job {
 
 	private EmployeeManagerImpl employeeManager;
 	
@@ -49,6 +49,8 @@ public class EmailJob implements Job {
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 
+		System.out.println("notification mail");
+		
 		for (Employee employee : allEmployees) {
 			sendMail(employee.getEmail());
 		}
