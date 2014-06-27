@@ -91,8 +91,7 @@ public class EmployeeManagerImpl implements EmployeeManager {
 			result = employeeDAO.checkEmployee(username, password);
 			HibernateUtil.commitTransaction();
 		} catch (HibernateException ex) {
-			// Error handling code
-		}
+System.out.println("EmployeeManagerImpl.checkEmployee()");		}
 		return result;
 	}
 
