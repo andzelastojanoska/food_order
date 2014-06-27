@@ -20,6 +20,9 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumn;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Food;
 import com.seavus.foodorder.model.Order;
@@ -45,13 +48,28 @@ public class AdminHomeMenuPanel {
 	private FoodManagerImpl foodManager;
 	private OrderManagerImpl orderManager;
 	
+	private Logger log;
+	
 	public AdminHomeMenuPanel(JPanel contentPane, JMenuBar menuBar) {
 		this.contentPane = contentPane;
-		
+		initLogger();
 		menuBar.add(homeMenu);
 		initializeMenu();
 		initializeContentPane();
 		addActionListeners();
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(AdminHomeMenuPanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("UserFileAppender");
+		log.removeAppender(appender);
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 	
 	public void initializeContentPane() {

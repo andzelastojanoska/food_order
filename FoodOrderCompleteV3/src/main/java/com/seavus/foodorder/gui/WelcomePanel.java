@@ -25,6 +25,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 
 import com.seavus.foodorder.model.Employee;
@@ -166,6 +167,8 @@ public class WelcomePanel extends JFrame {
 	
 	private void initLogger() {
 		log = Logger.getLogger(WelcomePanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("AdminFileAppender");
+		log.removeAppender(appender);
 	}
 	
 	private Logger getLogger() {

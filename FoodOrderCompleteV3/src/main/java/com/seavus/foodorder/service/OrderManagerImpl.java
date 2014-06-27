@@ -11,6 +11,7 @@ import com.seavus.foodorder.dao.OrderDAOImpl;
 import com.seavus.foodorder.hibernateutil.HibernateUtil;
 import com.seavus.foodorder.model.Employee;
 import com.seavus.foodorder.model.Order;
+import com.seavus.foodorder.model.Restaurant;
 
 public class OrderManagerImpl implements OrderManager {
 
@@ -53,6 +54,19 @@ public class OrderManagerImpl implements OrderManager {
 			System.out.println("Hangle error here");
 		}
 		return allOrders;
+	}
+
+	@Override
+	public List<Order> getTodaysOrdersForRestaurant(Restaurant restaurant) {
+		List<Order> orders = new ArrayList<Order>();
+		try {
+			HibernateUtil.beginTransaction();
+			orders = orderDAO.getTodaysOrdersForRestaurant(restaurant);
+			HibernateUtil.commitTransaction();
+		} catch (HibernateException ex) {
+			System.out.println("Hangle error here");
+		}
+		return orders;
 	}
 
 }

@@ -7,13 +7,19 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+
 @SuppressWarnings("serial")
 public class AdminMainPanel extends JFrame {
 
 	private JPanel contentPane;
 	private JMenuBar menuBar;
 	
+	private Logger log;
+	
 	public AdminMainPanel() {
+		initLogger();
 		setTitle("ADMIN PANEL");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 500, 300);
@@ -30,6 +36,19 @@ public class AdminMainPanel extends JFrame {
 		AdminUserMenuPanel adminUserMenuPanel = new AdminUserMenuPanel(contentPane, menuBar);
 		AdminRestaurantMenuPanel adminRestaurantMenuPanel = new AdminRestaurantMenuPanel(contentPane, menuBar);
 		AdminFoodMenuPanel adminFoodMenuPanel = new AdminFoodMenuPanel(contentPane, menuBar);
+	}
+	
+	private void initLogger() {
+		log = Logger.getLogger(AdminMainPanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("UserFileAppender");
+		log.removeAppender(appender);
+	}
+	
+	private Logger getLogger() {
+		if (log == null) {
+			initLogger();
+		}
+		return log;
 	}
 	
 /*	class BgPanel extends JPanel {

@@ -26,6 +26,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableColumn;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 
 import com.seavus.foodorder.model.Employee;
@@ -118,7 +119,9 @@ public class AllOrdersPanel extends JFrame {
 	}
 	
 	private void initLogger() {
-		log = Logger.getLogger(WelcomePanel.class.getName());
+		log = Logger.getLogger(AllOrdersPanel.class.getName());
+		Appender appender = Logger.getRootLogger().getAppender("AdminFileAppender");
+		log.removeAppender(appender);
 	}
 	
 	private Logger getLogger() {
