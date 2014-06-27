@@ -39,17 +39,16 @@ public class OrderDAOImpl extends GenericDAOImpl<Order, Long> implements OrderDA
 	@Override
 	public List<Order> getTodaysOrdersForRestaurant(Restaurant restaurant) {
 		List<Order> orders = new ArrayList<>();
-		Date date = new Date();
-//		String hql = "FROM Order o left join o.orderedFoods as of where of.food.id = " +
-//				"(Select rf.id From Restaurant r left join r.foods as rf)" +
-//				"and o.date = :date" +
-//				"and r.id = :restaurant_id";
-		String sql = "select * from orders as o , ordered_foods as of, foods as f where of.order_id = o.id and of.food_id = f.id and f.restaurant_id = :restaurant_id and o.date = :date";
+		  Date date = new Date();
+		  String sql = "select * from orders as o , ordered_foods as of, foods as f where of.order_id = o.id and of.food_id = f.id and f.restaurant_id = :restaurant_id and o.date = :date";
+		  Query query = HibernateUtil.getSession().createSQLQuery(sql).addEntity(Order.class);
+		  query.setParameter("date", date);
+		  query.setParameter("restaurant_id",restaurant.getId());
 		Query query = HibernateUtil.getSession().createSQLQuery(sql).addEntity(Order.class);
 		query.setParameter("date", date);
 		query.setParameter("restaurant_id",restaurant.getId());
-		orders = findMany(query);
-		return orders;
+		  orders = findMany(query);
+		  return orders;
 	}
 
 }
